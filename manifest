@@ -1,0 +1,21 @@
+#appname:Crayne
+#appid:crayne
+#publisher:glemon
+#image:default_app_logo.png
+#url:http://www.cs.ucr.edu/~limong
+#guid:4ab2a4df-41dc-4ddc-b987-f87909535771
+#desc:No description provided
+#type:desktop
+runtime:1.3.1-beta
+media:1.3.1-beta
+python:1.3.1-beta
+process:1.3.1-beta
+network:1.3.1-beta
+app:1.3.1-beta
+ui:1.3.1-beta
+worker:1.3.1-beta
+filesystem:1.3.1-beta
+database:1.3.1-beta
+platform:1.3.1-beta
+codec:1.3.1-beta
+monkey:1.3.1-beta

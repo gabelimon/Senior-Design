@@ -1,0 +1,36 @@
+body {
+    background-image: url('../img/wild_oliva.png');
+}
+
+@font-face {
+  font-family: 'Anchor Steam';
+  src: url('../img/Anchor Steam NF.ttf');
+}
+
+header.jumbotron h1{
+    text-align: center;
+    color:white;
+    font-family: 'Anchor Steam';
+}
+
+div#ch-user-container {
+    padding-top: 30px;
+    padding-right: 30px;
+}
+
+div#teus {
+    padding-top: 30px;
+    background-image: url("../img/noun_project_8075.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 440px;
+}
+
+div#teus-inner {
+    padding-top: 40px;
+}
+
+div.teu {
+    margin-left: 10px;
+    padding-bottom: 10px;
+}
