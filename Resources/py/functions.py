@@ -1,8 +1,38 @@
+def valid_manifest(manifest):
+    
+
+    return True
+
+def format_manifest(manifest_string):
+    assert valid_manifest(manifest_string)
+
+    manifest = {
+        'A': [""]*6,
+        'B': [""]*6,
+        'C': [""]*6,
+        'D': [""]*6,
+        'E': [""]*6,
+        'F': [""]*6,
+        'G': [""]*6,
+        'H': [""]*6,
+        'I': [""]*6,
+        'J': [""]*6,
+        'K': [""]*6,
+        'buffer':[]
+        }
+    for TEU in manifest_string.split('\n'):
+        cargo = manifest[2:].strip()
+        if cargo != 'Unoccupied':
+            manifest[TEU[0]][int(TEU[1])] = cargo
+
+    return manifest
+
 # A function needs to be written to take a matrix representing TEUs and boxes 
 # to be removed. The last array should be the buffer zone.
 # Said function needs to return a list of instructions represented as starting
 # positions and ending positions.
-def remove_boxes(manifest, desiredBoxPos):
+def remove_box(manifest, desiredBoxPos):
+    #T This block does nothing at all ever. Use assertions prolly
     try:
         1/(1-(1*(len(desiredBoxPos)-2)))
     except:
@@ -27,6 +57,7 @@ def remove_boxes(manifest, desiredBoxPos):
     #movelist = aStarFunction1(BoxPosNum)
     
     return rtrn#, "stuff"
+
 
 def insert_box(manifest, label):
     pos_x = 0
