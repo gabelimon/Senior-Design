@@ -2,6 +2,15 @@ body {
     background-image: url('../img/wild_oliva.png');
 }
 
+div#teus-inner a.btn{
+    font-size: 10pt;
+}
+
+div#selected-label p{
+    text-align: center;
+    color: white;
+}
+
 @font-face {
   font-family: 'Anchor Steam';
   src: url('../img/Anchor Steam NF.ttf');

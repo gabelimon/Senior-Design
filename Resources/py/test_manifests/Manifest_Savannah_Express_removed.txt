@@ -1,0 +1,48 @@
+A2	Unoccupied
+A3	Unoccupied
+A4	Unoccupied
+B1	Walmart, bicycles
+B2	Unoccupied
+B3	Unoccupied
+B4	Unoccupied
+B5	Unoccupied
+C1	Walmart, tools
+C2	Unoccupied
+C3	Unoccupied
+C4	Unoccupied
+C5	Unoccupied
+D1	Walmart, camping gear
+D2	Unoccupied
+D3	Unoccupied
+D4	Unoccupied
+D5	Unoccupied
+E1	Walmart, baby items
+E2	Unoccupied
+E3	Unoccupied
+E4	Unoccupied
+E5	Unoccupied
+F1	Walmart, shoes
+F2	Unoccupied
+F3	Unoccupied
+F4	Unoccupied
+F5	Unoccupied
+G1	Walmart, work boots
+G2	Unoccupied
+G3	Unoccupied
+G4	Unoccupied
+G5	Unoccupied
+H1	Walmart, light bulbs
+H2	Unoccupied
+H3	Unoccupied
+H4	Unoccupied
+H5	Unoccupied
+I1	Walmart, tv stands
+I2	Unoccupied
+I3	Unoccupied
+I4	Unoccupied
+I5	Unoccupied
+K1	Walmart, misc
+K2	Unoccupied
+K3	Unoccupied
+K4	Unoccupied
+K5	Unoccupied

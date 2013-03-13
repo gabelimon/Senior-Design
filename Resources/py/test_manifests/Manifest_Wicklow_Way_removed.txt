@@ -1,0 +1,49 @@
+A1	Walmart, tires and carpets
+A2	Jones, copper
+A3	Jones, silver
+A4	Jones, nickel
+B1	Walmart, bicycles
+B2	Smith, oil
+B3	Smith, olive oil
+B4	Smith, olives
+B5	Smith, cooking oil
+C1	Walmart, tools
+C2	Keogh, dog food
+C3	Keogh, cat food
+C4	Keogh, bird food
+C5	Keogh, horse food
+D1	Walmart, camping gear
+D2	Han, books
+D3	Han, cookbooks
+D4	Han, textbooks
+D5	Han, schoolbooks
+E1	Walmart, baby items
+E2	Yoshi, tires
+E3	Yoshi, car tires
+E4	Yoshi, bike tires
+E5	Yoshi, solid tires
+F1	Walmart, shoes
+F2	Najjar, fire alarms
+F3	Najjar, smoke alarms
+F4	Najjar, CO2 alarms
+F5	Najjar, radon alarms
+G1	Walmart, work boots
+G2	Young, lubricants
+G3	Young, auto lubricants
+G4	Young, bike lubricants
+G5	Young, hinge lubricants
+H1	Walmart, light bulbs
+H2	Nash, maple
+H3	Nash, oak
+H4	Nash, pine
+H5	Nash, chesnut
+I1	Walmart, tv stands
+I2	Vic and co, CDs
+I3	Vic and co, LPs
+I4	Vic and co, Tapes
+I5	Vic and co, MP3s
+K1	Walmart, misc
+K2	Rosales, eggs
+K3	Rosales, fish
+K4	Rosales, fowl
+K5	Rosales, apples

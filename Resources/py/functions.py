@@ -1,11 +1,19 @@
 def valid_manifest(manifest):
     
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> b59158fc1d86ffb23b76ecd0cd798711c29cb996
     return True
 
 def format_manifest(manifest_string):
     assert valid_manifest(manifest_string)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> b59158fc1d86ffb23b76ecd0cd798711c29cb996
     manifest = {
         'A': [""]*6,
         'B': [""]*6,
@@ -27,6 +35,7 @@ def format_manifest(manifest_string):
 
     return manifest
 
+<<<<<<< HEAD
 def choose_TEU(manifest, pos):
     
     return 0
@@ -37,6 +46,19 @@ def remove_boxes(manifest, desiredBoxPos):
     d_x = ord(desiredBoxPos[0])-65
     d_y = desiredBoxPos[1]-1
     
+=======
+# A function needs to be written to take a matrix representing TEUs and boxes 
+# to be removed. The last array should be the buffer zone.
+# Said function needs to return a list of instructions represented as starting
+# positions and ending positions.
+def remove_box(manifest, desiredBoxPos):
+    #T This block does nothing at all ever. Use assertions prolly
+    try:
+        1/(1-(1*(len(desiredBoxPos)-2)))
+    except:
+        print "ERROR: start position invalid"
+        
+>>>>>>> b59158fc1d86ffb23b76ecd0cd798711c29cb996
     rtrn = list(manifest)
     
     assert (d_x < 10) & (d_x >= 0), "Position out of scope"
@@ -55,6 +77,7 @@ def remove_boxes(manifest, desiredBoxPos):
     #movelist = aStarFunction1(BoxPosNum)
     
     return rtrn#, "stuff"
+
 
 def insert_box(manifest, label):
     pos_x = 0
