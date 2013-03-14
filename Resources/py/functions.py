@@ -1,7 +1,8 @@
+vert_cost = 42;
+horz_cost = 6;
+grab_cost = 4;
+letg_cost = 1;
 
-v_cost = 46;
-h_cost = 5;
-max_height []
 
 def valid_manifest(manifest):
     
@@ -32,18 +33,96 @@ def format_manifest(manifest_string):
 
     return manifest
 
+def move_box(manifest, startpos, endpos):
+    assert len(startpos) == 2, "The start position is invalid"
+    assert len(endpos) == 2, "The end position is invalid"
+    
+    rtrn = list(manifest)
+
+    s_x = ord(startpos[0])-65
+    s_y = startpos[1]-1
+    e_x = ord(endpos[0])-65
+    e_y = endpos[1]-1
+
+    assert (s_x < 10 and s_x >= 0),"Starting position out of scope"
+    assert (s_y < 6 and s_y >= 0),"Starting position out of scope"
+    assert (e_x < 10 and e_x >= 0),"Ending position out of scope"
+    assert (e_y < 6 and e_y >= 0),"Ending position out of scope"
+
+    temp = rtrn[s_x][s_y]
+    rtrn[s_x][s_y] = rtrn[e_x][e_y]
+    rtrn[e_x][e_y] = temp
+    
+    return rtrn
+
+def get_height(manifest, column):
+    top = 0;    
+    while (top < 6):
+        if (manifest[column][top] == "Unoccupied"):
+            return top
+        top = top + 1
+    return top    
+
+#STILL IN PROGRESS
+#PLEASE REVIEW
 def function(manifest, position):
+    #set the position to two integer values
     p_x = ord(position[0])-65
     p_y = position[1]-1
 
-    top = p_y
+    #record the height of every column of TEUs within 'height'
+    for a in xrange(10):
+        height[a]=get_height(manifest,a)
 
-    while (manifest[p_x][top+1] != "Unocupied" and top<6):
-        top = top+1
+    #set top to the hieght of the column where 'position' is located
+    top = height[p_x]
 
-      
-        
-    return 0
+    #if 'position' is the top of it's own column, remove it and be done
+    if(top == p_y):
+        manifest[p_x][top]="Unoccupied"
+        return manifest
+
+    min_cost = 5000
+    min_loc
+    
+    #This loop find the cheapest location to move a TEU above 'position'
+    for a in xrange(10):
+        cost = 0
+        temp_h = 0
+        cost = fabs(p_x-a)*horz_cost # add cost of horizontal movement
+
+        #if the location we are checking is to the left of 'position' column
+        if(a<px):
+            #find the highest column between the 'position' column and the location being checked
+            for b in xrange(a,px):
+                temp_h = max(temp_h,height[b])
+                
+        #if the location we are checking is to the right of 'position' column
+        if(a>px):
+            #find the highest column between the 'position' column and the location being checked
+            for b in xrange(px,a):
+                temp_h = max(temp_h,height[b])
+
+        #if the highest point between 'position' column and the location is less than the hight of 'position' column then set the temp_h to top 
+        if(temp_h<top):
+            temp_h=top
+
+        #add the cost of lifting and lowering the TEU
+        cost = cost + (temp_h+1-top)*vert_cost
+        cost = cost + (temp_h+1 - height[a])
+
+        #record the location with the minimum cost
+        if(cost < min_cost):
+            min_cost = cost
+            min_loc = a
+
+    #set end position to the location with the minimum cost
+    end_pos = [char(min_loc+65)][height[min_loc]]
+
+    #update manifest with the single crate moved
+    manifest = move_box(manifest,position,end_pos)   
+    
+    return manifest
 
 def remove_boxes(manifest, desiredBoxPos):
     assert len(desiredBoxPos) == 2, "The position is invalid"
@@ -61,7 +140,7 @@ def remove_boxes(manifest, desiredBoxPos):
         return rtrn
     
     #this line below will be removed in the final code
-    rtrn[d_x][d_y]="unoccupied"
+    rtrn[d_x][d_y]="Unoccupied"
 
     #movelist is appended with the proper steps after running A*
     #and rtrn is updated with the new manifest after the executed moves
@@ -86,31 +165,9 @@ def insert_box(manifest, label):
     rtrn[pos_x][pos_y] = label
     return rtrn
 
-def move_box(manifest, startpos, endpos):
-    assert len(startpos) == 2, "The start position is invalid"
-    assert len(endpos) == 2, "The end position is invalid"
-    
-    rtrn = list(manifest)
-
-    s_x = ord(startpos[0])-65
-    s_y = startpos[1]-1
-    e_x = ord(endpos[0])-65
-    e_y = endpos[1]-1
-
-    assert (s_x < 10 and s_x >= 0),"Starting position out of scope"
-    assert (s_y < 6 and s_y >= 0),"Starting position out of scope"
-    assert (e_x < 10 and e_x >= 0),"Ending position out of scope"
-    assert (e_y < 6 and e_y >= 0),"Ending position out of scope"
-
-    temp = rtrn[s_x][s_y]
-    rtrn[s_x][s_y] = rtrn[e_x][e_y]
-    rtrn[e_x][e_y] = temp
-    
-    return rtrn
-
 w=10
 h=6
-v="unoccupied"
+v="Unoccupied"
 man = [[v]*h for x in xrange(w)]
 man[0][0]="Bycicles"
 man[0][1]="Walmart Junk"
