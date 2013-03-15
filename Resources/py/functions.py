@@ -1,3 +1,4 @@
+
 vert_cost = 42;
 horz_cost = 6;
 grab_cost = 4;
@@ -65,6 +66,29 @@ def get_height(manifest, column):
 
 #STILL IN PROGRESS
 #PLEASE REVIEW
+
+def h_n(y):
+    #lifting TEU and moving over one    moving the crane back into position
+    #(4 + 42 + 6 + 42 + 1)             + (42 + 6 + 42 + 42)
+    return 227*(y-1)
+
+#should be added to h_n when calculating the h(n)
+#this is also the g(n) of the goal state
+def truck_cost(heights, x, y):
+    max_h = max(3,y)
+
+    for a in xrange(a,x):
+       max_h = max(a,max_h)
+
+    max_h = max_h-y+1
+
+    c = 0
+    if(y==0):
+        c=-42
+
+    #adding the cost of all movemments and grabs and releases
+    return 84*max_h+x*6+c+1+4
+
 def function(manifest, position):
     #set the position to two integer values
     p_x = ord(position[0])-65
