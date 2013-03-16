@@ -1,9 +1,18 @@
 
-vert_cost = 42;
-horz_cost = 6;
-grab_cost = 4;
-letg_cost = 1;
+vert_cost = 42
+horz_cost = 6
+grab_cost = 4
+letg_cost = 1
 
+class node:
+    def __init__(self):
+        self.parent = 0
+        self.start = []
+        self.end = []
+        self.man = []
+        self.gn = 0
+        self.hn = 0
+        
 
 def valid_manifest(manifest):
     
@@ -24,7 +33,7 @@ def format_manifest(manifest_string):
         'H': [""]*6,
         'I': [""]*6,
         'J': [""]*6,
-        'K': [""]*6,
+        #'K': [""]*6,
         'buffer':[]
         }
     for TEU in manifest_string.split('\n'):
@@ -45,20 +54,27 @@ def move_box(manifest, startpos, endpos):
     e_x = ord(endpos[0])-65
     e_y = endpos[1]-1
 
+    print "SY", s_y
+
     assert (s_x < 10 and s_x >= 0),"Starting position out of scope"
     assert (s_y < 6 and s_y >= 0),"Starting position out of scope"
-    assert (e_x < 10 and e_x >= 0),"Ending position out of scope"
+    assert (e_x < 11 and e_x >= 0),"Ending position out of scope"
     assert (e_y < 6 and e_y >= 0),"Ending position out of scope"
 
+
     temp = rtrn[s_x][s_y]
-    rtrn[s_x][s_y] = rtrn[e_x][e_y]
-    rtrn[e_x][e_y] = temp
+    if (e_x == 10):
+        rtrn[s_x][s_y] = "Unoccupied"
+        rtrn[10].append(temp)
+    else:
+        rtrn[s_x][s_y] = rtrn[e_x][e_y]
+        rtrn[e_x][e_y] = temp
     
     return rtrn
 
 def get_height(manifest, column):
     top = 0;    
-    while (top < 6):
+    while (top < 5):
         if (manifest[column][top] == "Unoccupied"):
             return top
         top = top + 1
@@ -89,62 +105,86 @@ def truck_cost(heights, x, y):
     #adding the cost of all movemments and grabs and releases
     return 84*max_h+x*6+c+1+4
 
-def function(manifest, position):
+
+def g_n(manifest, position):
     #set the position to two integer values
     p_x = ord(position[0])-65
     p_y = position[1]-1
 
     #record the height of every column of TEUs within 'height'
+    height=[]
     for a in xrange(10):
-        height[a]=get_height(manifest,a)
-
+        height.append(get_height(manifest,a))
+        
     #set top to the hieght of the column where 'position' is located
     top = height[p_x]
-
+    print top," ",p_y
+    
     #if 'position' is the top of it's own column, remove it and be done
-    if(top == p_y):
-        manifest[p_x][top]="Unoccupied"
+    if(top-1 == p_y):
+        manifest[p_x][top-1]="Unoccupied"
         return manifest
 
     min_cost = 5000
-    min_loc
+    min_loc = 0
+    max_r = 4
     
     #This loop find the cheapest location to move a TEU above 'position'
     for a in xrange(10):
         cost = 0
         temp_h = 0
-        cost = fabs(p_x-a)*horz_cost # add cost of horizontal movement
+        cost = abs(p_x-a)*horz_cost # add cost of horizontal movement
+        
+        if(a != p_x):            
+            #if the location we are checking is to the left of 'position' column
+            if(a < p_x):
+                #find the highest column between the 'position' column and the location being checked
+                for b in xrange(a,p_x):
+                    temp_h = max(temp_h,height[b])
+            #if the location we are checking is to the right of 'position' column
+            elif(a > p_x):
+                #find the highest column between the 'position' column and the location being checked
+                for b in xrange(p_x,a):
+                    temp_h = max(temp_h,height[b])
+                    max_r = max(max_r,height[b])
+                    
 
-        #if the location we are checking is to the left of 'position' column
-        if(a<px):
-            #find the highest column between the 'position' column and the location being checked
-            for b in xrange(a,px):
-                temp_h = max(temp_h,height[b])
-                
-        #if the location we are checking is to the right of 'position' column
-        if(a>px):
-            #find the highest column between the 'position' column and the location being checked
-            for b in xrange(px,a):
-                temp_h = max(temp_h,height[b])
+            #if the highest point between 'position' column and the location is
+            #less than the hight of 'position' column then set the temp_h to top 
+            if(temp_h < top):
+                temp_h=top
+            temp_h += 1
+            
+            print "TEMP: ",temp_h, " top: ", top, "Height[", a, "]: ", height[a]
+            #add the cost of lifting and lowering the TEU
+            cost += (temp_h - top)*vert_cost + (temp_h - (height[a]+1))*vert_cost
+            print "COST: ",cost
 
-        #if the highest point between 'position' column and the location is less than the hight of 'position' column then set the temp_h to top 
-        if(temp_h<top):
-            temp_h=top
+            #record the location with the minimum cost
+            if(cost < min_cost):
+                min_cost = cost
+                min_loc = a
 
-        #add the cost of lifting and lowering the TEU
-        cost = cost + (temp_h+1-top)*vert_cost
-        cost = cost + (temp_h+1 - height[a])
+    if(max_r < top):
+        max_r = top
+    max_r += 1    
+    cost = (max_r-top)*vert_cost + (13-p_x)*horz_cost + (max_r-4)*vert_cost
 
-        #record the location with the minimum cost
-        if(cost < min_cost):
-            min_cost = cost
-            min_loc = a
-
+    print "TEMP: ",max_r, " top: ", top,
+    print "COST: ",cost
+    
+    start_pos = [chr(p_x+65), top]
     #set end position to the location with the minimum cost
-    end_pos = [char(min_loc+65)][height[min_loc]]
+    if(cost < min_cost):
+        min_cost = cost
+        end_pos = ["K",1]
+    else:     
+        end_pos = [chr(min_loc+65), height[min_loc]+1]
 
+    print start_pos,"->",end_pos," : ",min_cost
+    
     #update manifest with the single crate moved
-    manifest = move_box(manifest,position,end_pos)   
+    manifest = move_box(manifest,start_pos,end_pos)   
     
     return manifest
 
@@ -193,35 +233,25 @@ w=10
 h=6
 v="Unoccupied"
 man = [[v]*h for x in xrange(w)]
-man[0][0]="Bycicles"
+man.append([])
+man[0][0]="Bicycles"
 man[0][1]="Walmart Junk"
 man[1][0]="The Good Stuff"
-
-for x in xrange(w):
+man[0][2]="Tardis"
+man[0][3]="BAMF"
+for x in xrange(w+1):
     print man[x]
 print '\n'
 
 input0 = ["A",2]
 input1 = ["C",1]
-input2 = ["B",1]
+input2 = ["B",2]
+input3 = ["A",1]
 
-man2 = move_box(man,input0,input1)
+man2 = g_n(man, input0)
+man2 = g_n(man, input0)
+man2 = g_n(man, input0)
 
-for x in xrange(w):
-    print man2[x]
-print '\n'
-
-removelist = [input2]
-
-man2 = remove_boxes(man,input2)
-
-for x in xrange(w):
-    print man2[x]
-print '\n'
-
-
-man2 = insert_box(man,"poop-poop")
-
-for x in xrange(w):
+for x in xrange(w+1):
     print man2[x]
 print '\n'
