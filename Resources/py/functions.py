@@ -1,18 +1,22 @@
+import sys
+sys.setrecursionlimit(10000)
 
 vert_cost = 42
 horz_cost = 6
 grab_cost = 4
 letg_cost = 1
+stack = []
+#truck position in index
+t_pos = ["T",1]
+#buffer position in index
+b_pos = ["K",4]
 
 class node:
     def __init__(self):
         self.parent = 0
-        self.start = []
-        self.end = []
-        self.man = []
+        self.heights = []
         self.gn = 0
-        self.hn = 0
-        
+        self.move = [[]*2 for x in xrange(2)]
 
 def valid_manifest(manifest):
     
@@ -33,8 +37,9 @@ def format_manifest(manifest_string):
         'H': [""]*6,
         'I': [""]*6,
         'J': [""]*6,
+        'K': []
         #'K': [""]*6,
-        'buffer':[]
+        #'buffer':[]
         }
     for TEU in manifest_string.split('\n'):
         cargo = manifest[2:].strip()
@@ -61,7 +66,6 @@ def move_box(manifest, startpos, endpos):
     assert (e_x < 11 and e_x >= 0),"Ending position out of scope"
     assert (e_y < 6 and e_y >= 0),"Ending position out of scope"
 
-
     temp = rtrn[s_x][s_y]
     if (e_x == 10):
         rtrn[s_x][s_y] = "Unoccupied"
@@ -72,6 +76,19 @@ def move_box(manifest, startpos, endpos):
     
     return rtrn
 
+def buff_cost(heights, x, y):
+    max_h = y
+
+    for a in xrange(x, 10):
+       max_h = max(heights[a],max_h)
+                         #upward lift cost        +  horizontal cost     + downward cost
+    if max_h < 4: return ((4- max_h) * vert_cost) + ((13-x) * horz_cost)
+    elif max_h == 4: return (2*vert_cost) + ((13-x) * horz_cost)
+    else: return (2 * (max_h - 4) * vert_cost) + ((13-x) * horz_cost)
+  
+    
+
+    
 def get_height(manifest, column):
     top = 0;    
     while (top < 5):
@@ -80,114 +97,129 @@ def get_height(manifest, column):
         top = top + 1
     return top    
 
+
 #STILL IN PROGRESS
 #PLEASE REVIEW
 
-def h_n(y):
+def h_n(manifest,y):
     #lifting TEU and moving over one    moving the crane back into position
     #(4 + 42 + 6 + 42 + 1)             + (42 + 6 + 42 + 42)
-    return 227*(y-1)
+    
+    count = 0
+    for x in xrange(10):
+        if manifest[x]==6:
+            count+=1
+    
+    return 227*(y-1+count)
 
 #should be added to h_n when calculating the h(n)
 #this is also the g(n) of the goal state
 def truck_cost(heights, x, y):
-    max_h = max(3,y)
+    max_h = y
 
-    for a in xrange(a,x):
-       max_h = max(a,max_h)
-
-    max_h = max_h-y+1
-
-    c = 0
-    if(y==0):
-        c=-42
+    for a in xrange(x):
+       max_h = max(heights[a],max_h)
+                         #upward lift cost        +  horizontal cost     + downward cost
+    if max_h < 5: return ((5- max_h) * vert_cost) + (65 +(x * horz_cost)) + (168)
+    elif max_h == 5: return (2*vert_cost) + (65 +(x * horz_cost)) + (168)
+    else: return (2 * (max_h - 5) * vert_cost) + (65 +(x * horz_cost)) + (168)
+#        max_h = max_h-y+1
+#    else 
+#    heights[x]-=1
+#    
+#    c = 0
+#    if(y==0):
+#        c=-42
 
     #adding the cost of all movemments and grabs and releases
-    return 84*max_h+x*6+c+1+4
+#    return 84*max_h+x*6+c+65
+
+def compute_g(m, startpos, endpos):
+    #assert len(startpos) == 2, "The start position is invalid"
+    #assert len(endpos) == 2, "The end position is invalid"
+    
+    #m = list(manifest)
+    #m is manifest
+
+    #s_x = ord(startpos[0])-65
+    #s_y = startpos[1]-1
+    #e_x = ord(endpos[0])-65
+    #e_y = endpos[1]-1
+
+    s_x = startpos
+    e_x = endpos
+    if s_x == e_x: return 5000
+    if m[e_x] == 6: return 5000
+    if e_x == 10: return buff_cost(m, startpos, m[startpos])
+    assert (s_x < 10 and s_x >= 0),"Starting position out of scope"
+    #assert (s_y < 6 and s_y >= 0),"Starting position out of scope"
+    assert (e_x < 11 and e_x >= 0),"Ending position out of scope"
+    #assert (e_y < 6 and e_y >= 0),"Ending position out of scope"
+    
+    #s_top = get_height(rtrn,s_x)
+    #e_top = get_height(rtrn,e_x)
+    s_top = m[s_x]
+    e_top = m[e_x]
+
+    h = max(s_top,e_top)
+ 
+    if s_x < e_x:
+        for a in xrange(s_x,e_x):
+            #h = max(h, get_height(m,a))
+            h = max(h,m[a])
+    if e_x > s_x:
+        for a in xrange(e_x,s_x):
+            #h = max(h, get_height(m,a))
+            h = max(h,m[a])
+      
+    h+=1
+    if e_x == 10:
+        e_x = 13
+
+    m[s_x]-=1
+    m[e_x]+=1
+        
+    return (h-s_top)*vert_cost + abs(s_x-e_x)*horz_cost + (h-1-e_top)*vert_cost
 
 
-def g_n(manifest, position):
+def A_Star(parent, position, goal, stack):
     #set the position to two integer values
-    p_x = ord(position[0])-65
-    p_y = position[1]-1
-
-    #record the height of every column of TEUs within 'height'
-    height=[]
-    for a in xrange(10):
-        height.append(get_height(manifest,a))
-        
-    #set top to the hieght of the column where 'position' is located
-    top = height[p_x]
-    print top," ",p_y
+    if parent.heights[position] == goal:
+        child = node()
+        child.parent = parent
+        child.heights = parent.heights[:]
+        child.gn = truck_cost(child.heights,position,goal)
+        child.move = [[chr(position+65),child.heights[position]],list(t_pos)]
+        return child
+    else:
+        for x in xrange(11):
+            if x != position: 
+                if x == 10:
+                    child = node()
+                    child.parent = parent
+                    child.heights = parent.heights[:]
+                    h = h_n(child.heights, child.heights[position])
+                    child.gn = compute_g(child.heights, position, 10)
+                    child.move = [[chr(position+65),child.heights[position]], list(b_pos)]
+                    f_n = child.gn + h
+                    stack.append([child, f_n])
+                else:
+                    child = node()
+                    child.parent = parent
+                    child.heights = parent.heights[:]
+                    h = h_n(child.heights, child.heights[position])
+                    child.gn = compute_g(child.heights,position, x)
+                    child.move = [[chr(position+65),child.heights[position]], [chr(x + 65), child.heights[x]]]
+                    f_n = child.gn + h
+                    stack.append([child, f_n])
+        stack = sorted(stack, key = lambda tup: tup[1])
+        poppers = node()
+        poppers = stack.pop(0)
+	popped = poppers[0]
+        return A_Star(popped,position,goal,stack)
+       
+    return 
     
-    #if 'position' is the top of it's own column, remove it and be done
-    if(top-1 == p_y):
-        manifest[p_x][top-1]="Unoccupied"
-        return manifest
-
-    min_cost = 5000
-    min_loc = 0
-    max_r = 4
-    
-    #This loop find the cheapest location to move a TEU above 'position'
-    for a in xrange(10):
-        cost = 0
-        temp_h = 0
-        cost = abs(p_x-a)*horz_cost # add cost of horizontal movement
-        
-        if(a != p_x):            
-            #if the location we are checking is to the left of 'position' column
-            if(a < p_x):
-                #find the highest column between the 'position' column and the location being checked
-                for b in xrange(a,p_x):
-                    temp_h = max(temp_h,height[b])
-            #if the location we are checking is to the right of 'position' column
-            elif(a > p_x):
-                #find the highest column between the 'position' column and the location being checked
-                for b in xrange(p_x,a):
-                    temp_h = max(temp_h,height[b])
-                    max_r = max(max_r,height[b])
-                    
-
-            #if the highest point between 'position' column and the location is
-            #less than the hight of 'position' column then set the temp_h to top 
-            if(temp_h < top):
-                temp_h=top
-            temp_h += 1
-            
-            print "TEMP: ",temp_h, " top: ", top, "Height[", a, "]: ", height[a]
-            #add the cost of lifting and lowering the TEU
-            cost += (temp_h - top)*vert_cost + (temp_h - (height[a]+1))*vert_cost
-            print "COST: ",cost
-
-            #record the location with the minimum cost
-            if(cost < min_cost):
-                min_cost = cost
-                min_loc = a
-
-    if(max_r < top):
-        max_r = top
-    max_r += 1    
-    cost = (max_r-top)*vert_cost + (13-p_x)*horz_cost + (max_r-4)*vert_cost
-
-    print "TEMP: ",max_r, " top: ", top,
-    print "COST: ",cost
-    
-    start_pos = [chr(p_x+65), top]
-    #set end position to the location with the minimum cost
-    if(cost < min_cost):
-        min_cost = cost
-        end_pos = ["K",1]
-    else:     
-        end_pos = [chr(min_loc+65), height[min_loc]+1]
-
-    print start_pos,"->",end_pos," : ",min_cost
-    
-    #update manifest with the single crate moved
-    manifest = move_box(manifest,start_pos,end_pos)   
-    
-    return manifest
-
 def remove_boxes(manifest, desiredBoxPos):
     assert len(desiredBoxPos) == 2, "The position is invalid"
 
@@ -229,6 +261,8 @@ def insert_box(manifest, label):
     rtrn[pos_x][pos_y] = label
     return rtrn
 
+
+
 w=10
 h=6
 v="Unoccupied"
@@ -243,15 +277,28 @@ for x in xrange(w+1):
     print man[x]
 print '\n'
 
-input0 = ["A",2]
+man2 = [4,1,0,0,0,0,0,0,0,0,4]
+
+input0 = ["A",4]
 input1 = ["C",1]
 input2 = ["B",2]
-input3 = ["A",1]
+input3 = ["B",1]
 
-man2 = g_n(man, input0)
-man2 = g_n(man, input0)
-man2 = g_n(man, input0)
 
-for x in xrange(w+1):
-    print man2[x]
-print '\n'
+#print buff_cost(man2, 0, 5)
+#global stack
+a = node()
+a.heights = list(man2)
+if a.heights[0] == 4: print a.heights[0]
+b = A_Star(a, 0, 3, stack)
+print b.list, b.move
+
+#sort(man2)
+#print man2
+#man2 = function(man, input0)
+#man2 = function(man, input0)
+#man2 = function(man, input0)
+
+#for x in xrange(w+1):
+#    print man2[x]
+#print '\n'
