@@ -1,11 +1,6 @@
 import sys
 sys.setrecursionlimit(10000)
 
-#GL
-#I like the globals but there aren't enough
-ship_width = 10
-ship_height = 5
-
 vert_cost = 42
 horz_cost = 6
 grab_cost = 4
@@ -47,9 +42,9 @@ def format_manifest(manifest_string):
         'H': [""]*6,
         'I': [""]*6,
         'J': [""]*6,
-        'K': []
-        #'K': [""]*6,
-        #'buffer':[]
+        #'K': []
+        'K': [""]*6,
+        'buffer':[]
         }
     for TEU in manifest_string.split('\n'):
         cargo = manifest[2:].strip()
@@ -91,17 +86,15 @@ def buff_cost(heights, x, y):
     max_h = y
 
     for a in xrange(x, 10):
-        max_h = max(heights[a],max_h)
+       max_h = max(heights[a],max_h)
                          #upward lift cost        +  horizontal cost     + downward cost
     if max_h < 4: return ((4- max_h) * vert_cost) + ((13-x) * horz_cost)
     elif max_h == 4: return (2*vert_cost) + ((13-x) * horz_cost)
     else: return (2 * (max_h - 4) * vert_cost) + ((13-x) * horz_cost)
   
     
-#GL
-# The height should just be the length of the column, right? Unoccupieds are 
-# removed in the creation of the manifests.
-# I imagine: return len(manifest[column])
+
+    
 def get_height(manifest, column):
     top = 0;    
     while (top < 5):
@@ -114,13 +107,6 @@ def get_height(manifest, column):
 #STILL IN PROGRESS
 #PLEASE REVIEW
 
-#GL
-# This code looks pretty bad. It has to know the exact location of the target
-# though. I imagine it would look like
-# move_side_cost = grab_cost + letg_cost + vert_cost*2 + horz_cost
-# move_down_cost = move_side_cost + vert_cost
-# move_out_of_ghetto_cost = grab_cost + letg_cost + vert_cost*2 + horz_cost*4 #remember we assume minimum
-# return (get_height(x) - y)*move_side_cost + get_num_at_top(manifest)*move_down_cost + len(manifest['k'])*move_out_of_ghetto_cost
 def h_n(manifest,y):
     #lifting TEU and moving over one    moving the crane back into position
     #(4 + 42 + 6 + 42 + 1)             + (42 + 6 + 42 + 42)
@@ -201,44 +187,63 @@ def compute_g(m, startpos, endpos):
         
     return (h-s_top)*vert_cost + abs(s_x-e_x)*horz_cost + (h-1-e_top)*vert_cost
 
+#parent is the node being passed in which branches to the child that will be made
+#position marks the column that we are moving from, equivelent to x value
+#goal marks the height of the TEU we intend to move, equivelent to y value
+#stack is the list of nodes that have yet to be expanded, it should always be sorted
+#depth is the record of the recursion in the A_Star function
+def A_Star(parent, position, goal, stack, depth):
+    #increment depth 
+    depth += 1
 
-def A_Star(parent, position, goal, stack):
-    #set the position to two integer values
-    if parent.heights[position] == goal:
-        child = node()
-        child.parent = parent
-        child.heights = parent.heights[:]
-        child.gn = truck_cost(child.heights,position,goal)
-        child.move = [[chr(position+65),child.heights[position]],list(t_pos)]
-        return child
+    #setup child node to point to the parent node and copy the list of heights from parent node
+    child = node()
+    child.parent = parent
+    child.heights = parent.heights[:]
+
+    #while the depth is no greater than 6
+    if depth < 7:
+        #if the goal TEU is the top TEU in the column at 'position' than set the 'gn' and 'move' to moving it to the truck, ['T',1], and return that child node
+        if parent.heights[position] == goal:
+            child.gn = truck_cost(child.heights,position,goal)
+            child.move = [[chr(position+65),child.heights[position]],list(t_pos)]
+            return child
+        #if the goal is not reached, move the top TEU in the column at 'position' to each of the ten possible locations it could be moved to, including the buffer
+        else:
+            for x in xrange(11):
+                if x != position:
+                    #if x == 10, move TEU to the buffer
+                    if x == 10:
+                        h = h_n(child.heights, child.heights[position])
+                        child.gn = compute_g(child.heights, position, 10)
+                        child.move = [[chr(position+65),child.heights[position]], list(b_pos)]
+                        f_n = child.gn + h
+                        stack.append([child, f_n])
+                    #otherwise, move TEU to the column at 'x'
+                    else:
+                        h = h_n(child.heights, child.heights[position])
+                        child.gn = compute_g(child.heights,position, x)
+                        child.move = [[chr(position+65),child.heights[position]], [chr(x + 65), child.heights[x]]]
+                        f_n = child.gn + h
+
+                    # append the new child to the stack and sort the stack based on it's f_n value
+                    # pop the top off the stack and 
+                    stack.append([child, f_n])
+                    stack = sorted(stack, key = lambda tup: tup[1])
+                    poppers = node()
+                    poppers = stack.pop(0)
+                    popped = poppers[0]
+                    return A_Star(popped,position,goal,stack,depth)
     else:
-        for x in xrange(11):
-            if x != position: 
-                if x == 10:
-                    child = node()
-                    child.parent = parent
-                    child.heights = parent.heights[:]
-                    h = h_n(child.heights, child.heights[position])
-                    child.gn = compute_g(child.heights, position, 10)
-                    child.move = [[chr(position+65),child.heights[position]], list(b_pos)]
-                    f_n = child.gn + h
-                    stack.append([child, f_n])
-                else:
-                    child = node()
-                    child.parent = parent
-                    child.heights = parent.heights[:]
-                    h = h_n(child.heights, child.heights[position])
-                    child.gn = compute_g(child.heights,position, x)
-                    child.move = [[chr(position+65),child.heights[position]], [chr(x + 65), child.heights[x]]]
-                    f_n = child.gn + h
-                    stack.append([child, f_n])
+        h = h_n(child.heights, child.heights[position])
+        child.gn = 5000
+        f_n = child.gn+h
+        stack.append([child, f_n])
         stack = sorted(stack, key = lambda tup: tup[1])
         poppers = node()
         poppers = stack.pop(0)
-	popped = poppers[0]
-        return A_Star(popped,position,goal,stack)
-       
-    return 
+        popped = poppers[0]
+        return A_Star(popped,position,goal,stack,depth)
     
 def remove_boxes(manifest, desiredBoxPos):
     assert len(desiredBoxPos) == 2, "The position is invalid"
@@ -306,19 +311,11 @@ input3 = ["B",1]
 
 
 #print buff_cost(man2, 0, 5)
-#global stack
+print man2
 a = node()
 a.heights = list(man2)
-if a.heights[0] == 4: print a.heights[0]
-b = A_Star(a, 0, 3, stack)
-print b.list, b.move
-
-#sort(man2)
-#print man2
-#man2 = function(man, input0)
-#man2 = function(man, input0)
-#man2 = function(man, input0)
-
-#for x in xrange(w+1):
-#    print man2[x]
-#print '\n'
+b = A_Star(a, 0, 3, stack, 0)
+print b.heights, b.move
+man2 = list(b.heights)
+b = A_Star(a, 0, 2, stack, 0)
+print b.heights, b.move
