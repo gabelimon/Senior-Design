@@ -28,8 +28,11 @@ def valid_manifest(manifest):
     
     return True
 
+#GL
 # Next time please notify me before changing the layout. Also I feel like
 # this is harder to read
+#GL
+# BIG CLARIFICATION. I DON'T INSERT UNOCCUPIED SPACES.
 def format_manifest(manifest_string):
     assert valid_manifest(manifest_string)
     
@@ -50,6 +53,7 @@ def format_manifest(manifest_string):
         }
     for TEU in manifest_string.split('\n'):
         cargo = manifest[2:].strip()
+        # If it's not Unoccupied insert it
         if cargo != 'Unoccupied':
             manifest[TEU[0]][int(TEU[1])] = cargo
 
