@@ -119,6 +119,16 @@ def h_n(manifest,y):
     #(4 + 42 + 6 + 42 + 1)             + (42 + 6 + 42 + 42)
     
     count = 0
+
+    # A more legible alternative using list splicing:
+    #
+    # for column_height in manifest[:-1]: #everything exept the last
+    #     if column_height == 6:
+    #         count += 1
+    #
+    # Or even better yet (using only the first ten in cast that's better):
+    #
+    # countInSixthRow = manifest[:10].count(6)
     for x in xrange(10):
         if manifest[x]==6:
             count+=1
