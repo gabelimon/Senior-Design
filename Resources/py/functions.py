@@ -37,9 +37,9 @@ def format_manifest(manifest_string):
         'H': [""]*6,
         'I': [""]*6,
         'J': [""]*6,
-        'K': []
-        #'K': [""]*6,
-        #'buffer':[]
+        #'K': []
+        'K': [""]*6,
+        'buffer':[]
         }
     for TEU in manifest_string.split('\n'):
         cargo = manifest[2:].strip()
@@ -181,44 +181,63 @@ def compute_g(m, startpos, endpos):
         
     return (h-s_top)*vert_cost + abs(s_x-e_x)*horz_cost + (h-1-e_top)*vert_cost
 
+#parent is the node being passed in which branches to the child that will be made
+#position marks the column that we are moving from, equivelent to x value
+#goal marks the height of the TEU we intend to move, equivelent to y value
+#stack is the list of nodes that have yet to be expanded, it should always be sorted
+#depth is the record of the recursion in the A_Star function
+def A_Star(parent, position, goal, stack, depth):
+    #increment depth 
+    depth += 1
 
-def A_Star(parent, position, goal, stack):
-    #set the position to two integer values
-    if parent.heights[position] == goal:
-        child = node()
-        child.parent = parent
-        child.heights = parent.heights[:]
-        child.gn = truck_cost(child.heights,position,goal)
-        child.move = [[chr(position+65),child.heights[position]],list(t_pos)]
-        return child
+    #setup child node to point to the parent node and copy the list of heights from parent node
+    child = node()
+    child.parent = parent
+    child.heights = parent.heights[:]
+
+    #while the depth is no greater than 6
+    if depth < 7:
+        #if the goal TEU is the top TEU in the column at 'position' than set the 'gn' and 'move' to moving it to the truck, ['T',1], and return that child node
+        if parent.heights[position] == goal:
+            child.gn = truck_cost(child.heights,position,goal)
+            child.move = [[chr(position+65),child.heights[position]],list(t_pos)]
+            return child
+        #if the goal is not reached, move the top TEU in the column at 'position' to each of the ten possible locations it could be moved to, including the buffer
+        else:
+            for x in xrange(11):
+                if x != position:
+                    #if x == 10, move TEU to the buffer
+                    if x == 10:
+                        h = h_n(child.heights, child.heights[position])
+                        child.gn = compute_g(child.heights, position, 10)
+                        child.move = [[chr(position+65),child.heights[position]], list(b_pos)]
+                        f_n = child.gn + h
+                        stack.append([child, f_n])
+                    #otherwise, move TEU to the column at 'x'
+                    else:
+                        h = h_n(child.heights, child.heights[position])
+                        child.gn = compute_g(child.heights,position, x)
+                        child.move = [[chr(position+65),child.heights[position]], [chr(x + 65), child.heights[x]]]
+                        f_n = child.gn + h
+
+                    # append the new child to the stack and sort the stack based on it's f_n value
+                    # pop the top off the stack and 
+                    stack.append([child, f_n])
+                    stack = sorted(stack, key = lambda tup: tup[1])
+                    poppers = node()
+                    poppers = stack.pop(0)
+                    popped = poppers[0]
+                    return A_Star(popped,position,goal,stack,depth)
     else:
-        for x in xrange(11):
-            if x != position: 
-                if x == 10:
-                    child = node()
-                    child.parent = parent
-                    child.heights = parent.heights[:]
-                    h = h_n(child.heights, child.heights[position])
-                    child.gn = compute_g(child.heights, position, 10)
-                    child.move = [[chr(position+65),child.heights[position]], list(b_pos)]
-                    f_n = child.gn + h
-                    stack.append([child, f_n])
-                else:
-                    child = node()
-                    child.parent = parent
-                    child.heights = parent.heights[:]
-                    h = h_n(child.heights, child.heights[position])
-                    child.gn = compute_g(child.heights,position, x)
-                    child.move = [[chr(position+65),child.heights[position]], [chr(x + 65), child.heights[x]]]
-                    f_n = child.gn + h
-                    stack.append([child, f_n])
+        h = h_n(child.heights, child.heights[position])
+        child.gn = 5000
+        f_n = child.gn+h
+        stack.append([child, f_n])
         stack = sorted(stack, key = lambda tup: tup[1])
         poppers = node()
         poppers = stack.pop(0)
-	popped = poppers[0]
-        return A_Star(popped,position,goal,stack)
-       
-    return 
+        popped = poppers[0]
+        return A_Star(popped,position,goal,stack,depth)
     
 def remove_boxes(manifest, desiredBoxPos):
     assert len(desiredBoxPos) == 2, "The position is invalid"
@@ -286,19 +305,11 @@ input3 = ["B",1]
 
 
 #print buff_cost(man2, 0, 5)
-#global stack
+print man2
 a = node()
 a.heights = list(man2)
-if a.heights[0] == 4: print a.heights[0]
-b = A_Star(a, 0, 3, stack)
-print b.list, b.move
-
-#sort(man2)
-#print man2
-#man2 = function(man, input0)
-#man2 = function(man, input0)
-#man2 = function(man, input0)
-
-#for x in xrange(w+1):
-#    print man2[x]
-#print '\n'
+b = A_Star(a, 0, 3, stack, 0)
+print b.heights, b.move
+man2 = list(b.heights)
+b = A_Star(a, 0, 2, stack, 0)
+print b.heights, b.move
