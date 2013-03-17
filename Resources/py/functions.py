@@ -1,6 +1,11 @@
 import sys
 sys.setrecursionlimit(10000)
 
+#GL
+#I like the globals but there aren't enough
+ship_width = 10
+ship_height = 5
+
 vert_cost = 42
 horz_cost = 6
 grab_cost = 4
@@ -23,6 +28,8 @@ def valid_manifest(manifest):
     
     return True
 
+# Next time please notify me before changing the layout. Also I feel like
+# this is harder to read
 def format_manifest(manifest_string):
     assert valid_manifest(manifest_string)
     
@@ -80,15 +87,17 @@ def buff_cost(heights, x, y):
     max_h = y
 
     for a in xrange(x, 10):
-       max_h = max(heights[a],max_h)
+        max_h = max(heights[a],max_h)
                          #upward lift cost        +  horizontal cost     + downward cost
     if max_h < 4: return ((4- max_h) * vert_cost) + ((13-x) * horz_cost)
     elif max_h == 4: return (2*vert_cost) + ((13-x) * horz_cost)
     else: return (2 * (max_h - 4) * vert_cost) + ((13-x) * horz_cost)
   
     
-
-    
+#GL
+# The height should just be the length of the column, right? Unoccupieds are 
+# removed in the creation of the manifests.
+# I imagine: return len(manifest[column])
 def get_height(manifest, column):
     top = 0;    
     while (top < 5):
@@ -101,6 +110,13 @@ def get_height(manifest, column):
 #STILL IN PROGRESS
 #PLEASE REVIEW
 
+#GL
+# This code looks pretty bad. It has to know the exact location of the target
+# though. I imagine it would look like
+# move_side_cost = grab_cost + letg_cost + vert_cost*2 + horz_cost
+# move_down_cost = move_side_cost + vert_cost
+# move_out_of_ghetto_cost = grab_cost + letg_cost + vert_cost*2 + horz_cost*4 #remember we assume minimum
+# return (get_height(x) - y)*move_side_cost + get_num_at_top(manifest)*move_down_cost + len(manifest['k'])*move_out_of_ghetto_cost
 def h_n(manifest,y):
     #lifting TEU and moving over one    moving the crane back into position
     #(4 + 42 + 6 + 42 + 1)             + (42 + 6 + 42 + 42)
