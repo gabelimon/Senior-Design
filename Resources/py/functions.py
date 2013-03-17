@@ -107,6 +107,13 @@ def get_height(manifest, column):
 #STILL IN PROGRESS
 #PLEASE REVIEW
 
+#GL IMPORTANT
+# Make this more readable and it'll be clear what you're missing.
+# All this currently calculates is how many are on the top and not what's in
+# the buffer and the REAL flaw here is that you're not adding in what it costs
+# to move everything from on top of you. You'd think this would be negligible
+# but the priority queue needs some way of knowing that's it's closer to the
+# solution.
 def h_n(manifest,y):
     #lifting TEU and moving over one    moving the crane back into position
     #(4 + 42 + 6 + 42 + 1)             + (42 + 6 + 42 + 42)
