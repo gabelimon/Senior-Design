@@ -23,11 +23,6 @@ def valid_manifest(manifest):
     
     return True
 
-#GL
-# Next time please notify me before changing the layout. Also I feel like
-# this is harder to read
-#GL
-# BIG CLARIFICATION. I DON'T INSERT UNOCCUPIED SPACES.
 def format_manifest(manifest_string):
     assert valid_manifest(manifest_string)
     
@@ -48,7 +43,6 @@ def format_manifest(manifest_string):
         }
     for TEU in manifest_string.split('\n'):
         cargo = manifest[2:].strip()
-        # If it's not Unoccupied insert it
         if cargo != 'Unoccupied':
             manifest[TEU[0]][int(TEU[1])] = cargo
 
@@ -111,28 +105,11 @@ def get_height(manifest, column):
 #STILL IN PROGRESS
 #PLEASE REVIEW
 
-#GL IMPORTANT
-# Make this more readable and it'll be clear what you're missing.
-# All this currently calculates is how many are on the top and not what's in
-# the buffer and the REAL flaw here is that you're not adding in what it costs
-# to move everything from on top of you. You'd think this would be negligible
-# but the priority queue needs some way of knowing that's it's closer to the
-# solution.
 def h_n(manifest,y):
     #lifting TEU and moving over one    moving the crane back into position
     #(4 + 42 + 6 + 42 + 1)             + (42 + 6 + 42 + 42)
     assert y>=0, "h_n input out of scope"
     count = 0
-
-    # A more legible alternative using list splicing:
-    #
-    # for column_height in manifest[:-1]: #everything exept the last
-    #     if column_height == 6:
-    #         count += 1
-    #
-    # Or even better yet (using only the first ten in cast that's better):
-    #
-    # countInSixthRow = manifest[:10].count(6)
     for x in xrange(10):
         if manifest[x]==6:
             count+=1
@@ -374,7 +351,7 @@ a.heights = list(man2)
 #man2 = list(b.heights)
 b = A_Star(a, 1, 1, stack, 0)
 print b.heights, b.move
-
+ 
 #sort(man2)
 #print man2
 #man2 = function(man, input0)
