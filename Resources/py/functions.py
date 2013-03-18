@@ -1,6 +1,8 @@
 import sys
 sys.setrecursionlimit(100000)
 
+const_w = 10
+const_h = 5
 vert_cost = 42
 horz_cost = 6
 grab_cost = 4
@@ -75,23 +77,6 @@ def move_box(manifest, startpos, endpos):
         rtrn[e_x][e_y] = temp
     
     return rtrn
-
-def buff_cost(heights, x, y):
-    max_h = y
-    for a in xrange(x, 10):
-       max_h = max(heights[a],max_h)
-               #upward & downward cost  +  horizontal cost
-    if max_h < 4:
-        return ((4- y) * vert_cost) + ((13-x) * horz_cost)
-    else:    
-        return (2*max_h-y)*vert_cost + ((13-x) * horz_cost)
-    #elif max_h == 4:
-        #return (2*vert_cost) + ((13-x) * horz_cost)
-    #else:
-        #return (2 * (max_h - 4) * vert_cost) + ((13-x) * horz_cost)
-  
-    
-
     
 def get_height(manifest, column):
     top = 0;    
@@ -101,22 +86,26 @@ def get_height(manifest, column):
         top = top + 1
     return top    
 
-
-#STILL IN PROGRESS
-#PLEASE REVIEW
-
 def h_n(manifest,y):
-    #lifting TEU and moving over one    moving the crane back into position
-    #(4 + 42 + 6 + 42 + 1)             + (42 + 6 + 42 + 42)
+    #lifting TEU and moving over one 
+    #(4 + 42 + 6 + 42 + 1)         
     assert y>=0, "h_n input out of scope"
-    count = 0
-    for x in xrange(10):
-        if manifest[x]==6:
-            count+=1
-    
-    #return 227*(y-1+count)
-    return 90*(y-1+count)
+    six_count = manifest.count(6)    
+    return 95 * (y - 1 + six_count)
 
+def buff_cost(heights, x, y):
+    max_h = y
+    for a in xrange(x, 10):
+       max_h = max(heights[a],max_h)
+       
+               #upward & downward cost  +  horizontal cost
+    if max_h < 4:
+        return ((4- y) * vert_cost) + ((13-x) * horz_cost)
+    elif x == 9:
+        return (max_h-2)*vert_cost + ((13-x) * horz_cost)
+    else:
+        return (2*max_h-y)*vert_cost + ((13-x) * horz_cost)
+  
 #should be added to h_n when calculating the h(n)
 #this is also the g(n) of the goal state
 def truck_cost(heights, x, y):
@@ -124,40 +113,22 @@ def truck_cost(heights, x, y):
 
     for a in xrange(x):
        max_h = max(heights[a],max_h)
-                         #upward lift cost        +  horizontal cost     + downward cost
-    if max_h < 5: return ((5- max_h) * vert_cost) + (65 +(x * horz_cost)) + (168)
-    elif max_h == 5: return (2*vert_cost) + (65 +(x * horz_cost)) + (168)
-    else: return (2 * (max_h - 5) * vert_cost) + (65 +(x * horz_cost)) + (168)
-#        max_h = max_h-y+1
-#    else 
-#    heights[x]-=1
-#    
-#    c = 0
-#    if(y==0):
-#        c=-42
+     #upward lift cost        +  horizontal cost     + downward cost
+    if max_h < 5:
+        return ((5-y)*vert_cost) + (65 +(x * horz_cost)) + (168)
+    elif x == 0:
+        return (max_h-3)*vert_cost + (65 +(x * horz_cost)) + (168)
+    else:
+        return (2*max_h - (y+1))*vert_cost + (65 +(x * horz_cost)) + (168)
 
-    #adding the cost of all movemments and grabs and releases
-#    return 84*max_h+x*6+c+65
 
 def compute_g(m, startpos, endpos):
-    #assert len(startpos) == 2, "The start position is invalid"
-    #assert len(endpos) == 2, "The end position is invalid"
-    
-    #m = list(manifest)
-    #m is manifest
-
-    #s_x = ord(startpos[0])-65
-    #s_y = startpos[1]-1
-    #e_x = ord(endpos[0])-65
-    #e_y = endpos[1]-1
-
     s_x = startpos
     e_x = endpos
     assert (s_x < 10 and s_x >= 0),"Starting position out of scope"
-    #assert (s_y < 6 and s_y >= 0),"Starting position out of scope"
     assert (e_x < 11 and e_x >= 0),"Ending position out of scope"
-    #assert (e_y < 6 and e_y >= 0),"Ending position out of scope"
     assert (m[s_x] > 0), "Starting position is unoccupied"
+    
     if s_x == e_x:
         return 5000
     if m[e_x] == 6:
@@ -166,23 +137,18 @@ def compute_g(m, startpos, endpos):
         return 5000
     if e_x == 10: 
         m[s_x]-=1
-        #m[e_x]+=1
         return buff_cost(m, startpos, m[startpos])
     
-    #s_top = get_height(rtrn,s_x)
-    #e_top = get_height(rtrn,e_x)
     s_top = m[s_x]
     e_top = m[e_x]
 
-    h = max(s_top,e_top)
+    h = max(m[s_x],m[e_x])
  
     if s_x < e_x:
         for a in xrange(s_x,e_x):
-            #h = max(h, get_height(m,a))
             h = max(h,m[a])
     if e_x > s_x:
         for a in xrange(e_x,s_x):
-            #h = max(h, get_height(m,a))
             h = max(h,m[a])
       
     h+=1
@@ -200,10 +166,6 @@ def compute_g(m, startpos, endpos):
 #stack is the list of nodes that have yet to be expanded, it should always be sorted
 #depth is the record of the recursion in the A_Star function
 def A_Star(parent, position, goal, stack, depth):
-    #increment depth 
-    #depth += 1
-
-    #raw_input()
     #setup child node to point to the parent node and copy the list of heights from parent node
     child = node()
     child.parent = parent
@@ -230,8 +192,8 @@ def A_Star(parent, position, goal, stack, depth):
         for x in xrange(11):
             if x != position:
                 h = h_n(child.heights, child.heights[position])
-                #child.gn = compute_g(child.heights,position, x)
                 gn_to_add = compute_g(child.heights,position, x)
+                
                 #if x == 10, move TEU to the buffer
                 if x == 10:
                     child.move = [[chr(position+65),child.heights[position]], list(b_pos)]
@@ -240,6 +202,7 @@ def A_Star(parent, position, goal, stack, depth):
                     child.move = [[chr(position+65),child.heights[position]], [chr(x + 65), child.heights[x]]]
 
                 # append the new child to the stack
+                # use stack_child so as not to overwrite child in the for loop
                 stack_child = node()
                 stack_child.parent = child.parent
                 stack_child.heights = child.heights[:]
@@ -261,21 +224,7 @@ def A_Star(parent, position, goal, stack, depth):
         poppers = node()
         poppers = stack.pop(0)
         popped = poppers[0]
-        #for x in xrange(len(stack)):
-        #    print stack[x][1]
         return A_Star(popped,position,goal,stack,depth)
-    #else:
-    #    child.gn += 15000
-    #    f_n = child.gn
-    #    stack.append([child, f_n])
-    #    stack = sorted(stack, key = lambda tup: tup[1])
-    #    poppers = node()
-    #    poppers = stack.pop(0)
-    #    popped = poppers[0]
-    #    print "check2"
-    #    for x in xrange(len(stack)):
-    #        print stack[x][1]
-    #    return A_Star(popped,position,goal,stack,depth)
     
 def remove_boxes(manifest, desiredBoxPos):
     assert len(desiredBoxPos) == 2, "The position is invalid"
@@ -341,23 +290,8 @@ input1 = ["C",1]
 input2 = ["B",2]
 input3 = ["B",1]
 
-
-#print buff_cost(man2, 0, 5)
 print man2
 a = node()
 a.heights = list(man2)
-#b = A_Star(a, 0, 3, stack, 0)
-#print b.heights, b.move
-#man2 = list(b.heights)
 b = A_Star(a, 1, 1, stack, 0)
 print b.heights, b.move
- 
-#sort(man2)
-#print man2
-#man2 = function(man, input0)
-#man2 = function(man, input0)
-#man2 = function(man, input0)
-
-#for x in xrange(w+1):
-#    print man2[x]
-#print '\n'
