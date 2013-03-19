@@ -13,7 +13,8 @@
       <header class="jumbotron subhead">
 	<h1 class="span3 offset5">Crayne</h1>
 	<div id="ch-user-container" class="span2 pull-right">
-	  <a id="ch-user-btn" class="btn btn-primary pull-left" href="#">Change User</a>
+	  <a id="ch-user-btn" class="btn btn-primary pull-left" href="#chUser" 
+        role="button" data-toggle="modal">Change User</a>
 	</div>
       </header>
     </div>
@@ -98,8 +99,8 @@
 	<p>Hello</p>
       </div>
     </div>
-    <div class="row">
-      <div class="span10 offset1">
+    <div class="container">
+      <div class="span10">
 	<a class="btn btn-info span1" href="#">Retrieve Manifest</a>
 	<a class="btn btn-warning span1" href="#">Load New Manifest</a>
 	<a class="mutator btn btn-danger span1 offset1 disabled" href="#">Remove TEUs</a>
@@ -107,7 +108,46 @@
 	<a class="btn btn-inverse span1 offset1" href="#">Cancel Step</a>
 	<a class="btn btn-success span1" href="#">Next Step (confirm)</a>
       </div>
-      <a class="btn btn-primary offset1 span1" href="#">Buffer X3</a>
+      <div id="importantButtons" class="span12">
+      <a href="#viewLog" role="button" class="btn pull-left span3" data-toggle="modal">View Logs</a>
+      <a class="btn btn-primary offset1 span1 pull-right" href="#">Buffer X3</a>
+      </div>
     </div>
+
+    <div id="modals">
+ 
+    <!-- Modal -->
+    <div id="viewLog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Logs</h3>
+    </div>
+    <div class="modal-body">
+    <p></p>
+    </div>
+    <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button class="btn btn-primary">Save changes</button>
+    </div>
+    </div>
+    </div>
+
+    <div id="chUser" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Select User</h3>
+    </div>
+    <div class="modal-body">
+    <form>
+    <input type="text" type="password" placeholder="Password">
+    <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    </div>
+    <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+    </div>
+    </div>
+
   </body>
 </html>
