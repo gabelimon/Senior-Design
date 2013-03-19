@@ -12,8 +12,10 @@
     <div class="row">
       <header class="jumbotron subhead">
 	<h1 class="span3 offset5">Crayne</h1>
-	<div id="ch-user-container" class="span2 pull-right">
-	  <a id="ch-user-btn" class="btn btn-primary pull-left" href="#">Change User</a>
+	<div id="ch-user-container" class="span4 pull-right">
+        <a href="#createUser" role="button" data-toggle="modal" class="btn span1">Register</a>
+	  <a id="ch-user-btn" class="btn btn-primary span1" href="#chUser" 
+        role="button" data-toggle="modal">Change User</a>
 	</div>
       </header>
     </div>
@@ -98,16 +100,86 @@
 	<p>Hello</p>
       </div>
     </div>
-    <div class="row">
-      <div class="span10 offset1">
+    <div class="container">
+      <div class="span12">
 	<a class="btn btn-info span1" href="#">Retrieve Manifest</a>
 	<a class="btn btn-warning span1" href="#">Load New Manifest</a>
-	<a class="mutator btn btn-danger span1 offset1 disabled" href="#">Remove TEUs</a>
+	<a class="mutator btn btn-danger span1 offset2 disabled" href="#">Remove TEUs</a>
 	<a class="mutator btn btn-danger span1 disabled" href="#">Add TEUs</a>
-	<a class="btn btn-inverse span1 offset1" href="#">Cancel Step</a>
+	<a class="btn btn-inverse span1 offset2" href="#">Cancel Step</a>
 	<a class="btn btn-success span1" href="#">Next Step (confirm)</a>
       </div>
-      <a class="btn btn-primary offset1 span1" href="#">Buffer X3</a>
+      <div id="importantButtons" class="span12">
+      <a href="#viewLog" role="button" class="btn pull-left span3" data-toggle="modal">View Logs</a>
+      <a class="btn btn-primary offset1 span1 pull-right" href="#">Buffer X3</a>
+      </div>
     </div>
+
+    <div id="modals">
+ 
+    <!-- Log Modal -->
+    <div id="viewLog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="viewLogLabel">Logs</h3>
+    </div>
+    <div class="modal-body">
+    <p></p>
+    </div>
+    <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button class="btn btn-primary">Save changes</button>
+    </div>
+    </div>
+    </div>
+
+    <!--User Select-->
+    <div id="chUser" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="chUserLabel">Select User</h3>
+    </div>
+    <div class="modal-body">
+    <form>
+    <label class="radio">
+        <input type="radio" name="userName" id="userID-1" value="Keogh" checked>
+            Keogh
+    </label>
+    <label class="radio">
+        <input type="radio" name="UserName" id="userID-2" value="Jeff">
+        Jeff
+    </label>
+    <input type="text" type="password" placeholder="Password"><br/>
+    <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    </div>
+    <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+    </div>
+    </div>
+    
+    <!--Create User Modal-->
+    <div id="createUser" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="createUserLabel">Create</h3>
+    </div>
+    <div class="modal-body">
+    <form>
+    <p>
+    Desired User Name: <input type="text" placeholder="Alex123" name="createUser" required="required" class="pull-right"><br/>
+    Password: <input type="text" type="password" placeholder="Password" name="createPasswd" required="required" class="pull-right"><br/>
+    Confirm: <input type="text" type="password" placeholder="Confirm Password" name="confirmPasswd" required="required" class="pull-right"><br/>
+    <button type="submit" class="btn btn-primary">Submit</button>
+    </p>
+    </form>
+    </div>
+    <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+    </div>
+    </div>
+
   </body>
 </html>

@@ -1,7 +1,7 @@
 $(document).ready( function() {
     var window = Ti.UI.currentWindow;
     window.maximize();
-    userName = "";
+    var userName = "";
     // Here we should force a log on
 });
 
@@ -20,9 +20,9 @@ $("#ch-user-btn").click( function() {
     while (rows.isValidRow()) {
 	//Alert the value of fields id and firstName from the Users database
 	alert('The user id is '+
-	      rows.fieldByName('id')+
-	      ', and user name is '
-	      +rows.fieldByName('firstName'));
+        rows.fieldByName('id')+
+        ', and user name is '
+        +rows.fieldByName('firstName'));
 	rows.next();    
     }
 
