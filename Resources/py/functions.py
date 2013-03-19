@@ -205,7 +205,7 @@ def manifest_to_heights(manifest):
         for y in xrange(len(manifest[x])):
             if manifest[x][y] == unoccupied:
                 h.append(y)
-                break
+                break 
     h.append(0)
     return h
 
