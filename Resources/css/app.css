@@ -2,11 +2,11 @@ body {
     background-image: url('../img/wild_oliva.png');
 }
 
-div#teus-inner a.btn{
+#teus-inner .btn{
     font-size: 10pt;
 }
 
-div#selected-label p{
+#selected-label > p{
     text-align: center;
     color: white;
 }
@@ -16,18 +16,18 @@ div#selected-label p{
   src: url('../img/Anchor Steam NF.ttf');
 }
 
-header.jumbotron h1{
+.jumbotron > h1{
     text-align: center;
     color:white;
     font-family: 'Anchor Steam';
 }
 
-div#ch-user-container {
+#ch-user-container {
     padding-top: 30px;
     padding-right: 30px;
 }
 
-div#teus {
+#teus {
     padding-top: 30px;
     background-image: url("../img/noun_project_8075.png");
     background-position: center;
@@ -35,11 +35,11 @@ div#teus {
     height: 440px;
 }
 
-div#teus-inner {
+#teus-inner {
     padding-top: 40px;
 }
 
-div.teu {
+.teu {
     margin-left: 10px;
     padding-bottom: 10px;
 }
