@@ -1,6 +1,9 @@
 import sys
 sys.setrecursionlimit(100000)
 
+unoccupied = ""
+buff = []
+char_conv = 65
 const_w = 10
 const_h = 5
 vert_cost = 42
@@ -11,7 +14,7 @@ stack = []
 #truck position in index
 t_pos = ["T",1]
 #buffer position in index
-b_pos = ["K",4]
+b_pos = ["K",10]
 
 class node:
     def __init__(self):
@@ -29,59 +32,29 @@ def format_manifest(manifest_string):
     assert valid_manifest(manifest_string)
     
     manifest = {
-        'A': [""]*6,
-        'B': [""]*6,
-        'C': [""]*6,
-        'D': [""]*6,
-        'E': [""]*6,
-        'F': [""]*6,
-        'G': [""]*6,
-        'H': [""]*6,
-        'I': [""]*6,
-        'J': [""]*6,
-        #'K': []
-        'K': [""]*6,
+        'A': [unoccupied]*6,
+        'B': [unoccupied]*6,
+        'C': [unoccupied]*6,
+        'D': [unoccupied]*6,
+        'E': [unoccupied]*6,
+        'F': [unoccupied]*6,
+        'G': [unoccupied]*6,
+        'H': [unoccupied]*6,
+        'I': [unoccupied]*6,
+        'J': [unoccupied]*6,
         'buffer':[]
         }
     for TEU in manifest_string.split('\n'):
         cargo = manifest[2:].strip()
-        if cargo != 'Unoccupied':
+        if cargo != unoccupied:
             manifest[TEU[0]][int(TEU[1])] = cargo
 
     return manifest
-
-def move_box(manifest, startpos, endpos):
-    assert len(startpos) == 2, "The start position is invalid"
-    assert len(endpos) == 2, "The end position is invalid"
-    
-    rtrn = list(manifest)
-
-    s_x = ord(startpos[0])-65
-    s_y = startpos[1]-1
-    e_x = ord(endpos[0])-65
-    e_y = endpos[1]-1
-
-    print "SY", s_y
-
-    assert (s_x < 10 and s_x >= 0),"Starting position out of scope"
-    assert (s_y < 6 and s_y >= 0),"Starting position out of scope"
-    assert (e_x < 11 and e_x >= 0),"Ending position out of scope"
-    assert (e_y < 6 and e_y >= 0),"Ending position out of scope"
-
-    temp = rtrn[s_x][s_y]
-    if (e_x == 10):
-        rtrn[s_x][s_y] = "Unoccupied"
-        rtrn[10].append(temp)
-    else:
-        rtrn[s_x][s_y] = rtrn[e_x][e_y]
-        rtrn[e_x][e_y] = temp
-    
-    return rtrn
     
 def get_height(manifest, column):
     top = 0;    
     while (top < 5):
-        if (manifest[column][top] == "Unoccupied"):
+        if (manifest[column][top] == unoccupied):
             return top
         top = top + 1
     return top    
@@ -129,15 +102,9 @@ def compute_g(m, startpos, endpos):
     assert (e_x < 11 and e_x >= 0),"Ending position out of scope"
     assert (m[s_x] > 0), "Starting position is unoccupied"
     
-    if s_x == e_x:
-        return 5000
-    if m[e_x] == 6:
-        m[s_x]-=1
-        m[e_x]+=1
-        return 5000
-    if e_x == 10: 
-        m[s_x]-=1
-        return buff_cost(m, startpos, m[startpos])
+    if s_x == e_x: return 5000
+    if m[e_x] == 6: return 5000
+    if e_x == 10: return buff_cost(m, startpos, m[startpos])
     
     s_top = m[s_x]
     e_top = m[e_x]
@@ -155,8 +122,6 @@ def compute_g(m, startpos, endpos):
     if e_x == 10:
         e_x = 13
 
-    m[s_x]-=1
-    m[e_x]+=1
         
     return (h-s_top)*vert_cost + abs(s_x-e_x)*horz_cost + (h-1-e_top)*vert_cost
 
@@ -164,8 +129,7 @@ def compute_g(m, startpos, endpos):
 #position marks the column that we are moving from, equivelent to x value
 #goal marks the height of the TEU we intend to move, equivelent to y value
 #stack is the list of nodes that have yet to be expanded, it should always be sorted
-#depth is the record of the recursion in the A_Star function
-def A_Star(parent, position, goal, stack, depth):
+def A_Star(parent, position, goal, stack):
     #setup child node to point to the parent node and copy the list of heights from parent node
     child = node()
     child.parent = parent
@@ -174,33 +138,30 @@ def A_Star(parent, position, goal, stack, depth):
 
     #a temporary value for child.heights so that child.heights can be reverted for every new movement
     h_temp = child.heights[:]
-
-    #while the depth is no greater than 6
-    #if depth < 7:
-    assert depth < 7, "A* has exceeded it's depth limit"
     
     #if the goal TEU is the top TEU in the column at 'position' than set the 'gn' and 'move' to moving it to the truck, ['T',1], and return that child node
-    print "goal: ", goal
-    print parent.heights[position],"\n"
-    
-    if parent.heights[position] == goal:
+   
+    if parent.heights[position] == goal:		
         child.gn = truck_cost(child.heights,position,goal)
-        child.move = [[chr(position+65),child.heights[position]],list(t_pos)]
+        child.move = [[chr(position+char_conv),child.heights[position]],list(t_pos)]
+        child.heights[position] -= 1
         return child
         #if the goal is not reached, move the top TEU in the column at 'position' to each of the ten possible locations it could be moved to, including the buffer
     else:
         for x in xrange(11):
             if x != position:
                 h = h_n(child.heights, child.heights[position])
-                gn_to_add = compute_g(child.heights,position, x)
                 
                 #if x == 10, move TEU to the buffer
                 if x == 10:
-                    child.move = [[chr(position+65),child.heights[position]], list(b_pos)]
+                    child.move = [[chr(position+char_conv),child.heights[position]], list(b_pos)]
                 #otherwise, move TEU to the column at 'x'
                 else:
-                    child.move = [[chr(position+65),child.heights[position]], [chr(x + 65), child.heights[x]]]
+                    child.move = [[chr(position+char_conv),child.heights[position]], [chr(x + char_conv), child.heights[x]+1]]
 
+                gn_to_add = compute_g(child.heights,position, x)
+		child.heights[position] -=1
+		child.heights[x] += 1
                 # append the new child to the stack
                 # use stack_child so as not to overwrite child in the for loop
                 stack_child = node()
@@ -212,11 +173,11 @@ def A_Star(parent, position, goal, stack, depth):
                 stack.append([stack_child, f_n])
                 child.heights = h_temp[:]
                 
-                print "old g(n):",child.gn
-                print "new g(n): ",stack_child.gn
-                print "h(n): ",h
-                print "f(n): ",f_n
-                print stack_child.heights , "\n"
+#                print "old g(n):",child.gn
+#                print "new g(n): ",stack_child.gn
+#                print "h(n): ",h
+#                print "f(n): ",f_n
+#                print stack_child.heights , "\n"
                 
         #sort the stack based on it's f_n value
         # and pop the top off the stack
@@ -224,74 +185,67 @@ def A_Star(parent, position, goal, stack, depth):
         poppers = node()
         poppers = stack.pop(0)
         popped = poppers[0]
-        return A_Star(popped,position,goal,stack,depth)
+        return A_Star(popped,position,goal,stack)
+
+def list_moves(child):
+    if child.parent == 0: 
+	thing =[]
+	thing.append(list(child.move))
+	thing.pop()
+	return thing
+    else:
+	thing = list_moves(child.parent) 
+	thing.append(list(child.move))
+	return thing
     
-def remove_boxes(manifest, desiredBoxPos):
-    assert len(desiredBoxPos) == 2, "The position is invalid"
-
-    d_x = ord(desiredBoxPos[0])-65
-    d_y = desiredBoxPos[1]-1
+def manifest_to_heights(manifest):
+    h = []
     
-    rtrn = list(manifest)
-    
-    assert (d_x < 10) & (d_x >= 0), "Position out of scope"
-    assert (d_y < 6) & (d_y >= 0), "Position out of scope"
+    for x in xrange(len(manifest)) :
+        for y in xrange(len(manifest[x])):
+            if manifest[x][y] == unoccupied:
+                h.append(y)
+                break
+    h.append(0)
+    return h
 
-    if (rtrn[d_x][d_y] == "unoccupied"):
-        print "Position already unoccupied"
-        return rtrn
-    
-    #this line below will be removed in the final code
-    rtrn[d_x][d_y]="Unoccupied"
-
-    #movelist is appended with the proper steps after running A*
-    #and rtrn is updated with the new manifest after the executed moves
-    #---------
-    #movelist = aStarFunction1(BoxPosNum)
-    
-    return rtrn#, "stuff"
-
-def insert_box(manifest, label):
-    pos_x = 0
-    pos_y = 0
-
-    rtrn = list(manifest)
-    
-    assert len(label) > 5, "The TEU label has too few characters"
-    
-    #perform A* to find best position for new crate
-    #the position is assigned to pos_x and pos_y
-    #----------
-    #aStarFunction2(manifest,pos_x,pos_y)
-
-    rtrn[pos_x][pos_y] = label
-    return rtrn
-
-
-
-w=10
-h=6
-v="Unoccupied"
-man = [[v]*h for x in xrange(w)]
-man.append([])
-man[0][0]="Bicycles"
-man[0][1]="Walmart Junk"
-man[1][0]="The Good Stuff"
-man[0][2]="Tardis"
-man[0][3]="BAMF"
-for x in xrange(w+1):
-    print man[x]
-print '\n'
-
-man2 = [0,5,0,0,4,0,0,0,0,0,4]
-
-input0 = ["A",4]
-input1 = ["C",1]
-input2 = ["B",2]
-input3 = ["B",1]
-
-print man2
-a = node()
-a.heights = list(man2)
-b = A_Star(a, 1, 1, stack, 0)
-print b.heights, b.move
+def run_A_get_Moves(manifest, TEU_to_pull):
+    s_x = ord(TEU_to_pull[0])-65   
+    s_y = TEU_to_pull[1]
+    manifest_heights = manifest_to_heights(manifest)
+    problem = node()
+    problem.heights = list(manifest_heights)
+    solution = A_Star(problem, s_x, s_y, stack)
+    list_of_moves = list_moves(solution)
+    cost = 0
+    ran = solution.heights[10]
+    for x in xrange (ran):
+	best = 5000
+	z = 11
+	for y in xrange(10):
+	    cost = buff_cost(solution.heights, y, solution.heights[y])
+	    if cost < best:
+		best = cost
+		z = y
+	solution.heights[z] += 1
+	solution.heights[10] -= 1
+	move_to_add = [list(b_pos), [chr(z+char_conv),solution.heights[z]]]
+	list_of_moves.append(move_to_add)
+    for x in xrange(10):
+	if solution.heights[x] > 5:
+	    best = 5000
+	    z = 11
+	    for y in range(10):
+		if solution.heights[y] < 5:
+	            cost = compute_g(solution.heights, x, y)
+		    if best > cost: 
+		        best = cost
+		        z = y
+         
+	    move_to_add = [[chr(x+char_conv),solution.heights[x]], [chr(z + char_conv), solution.heights[z]+1]]
+	    solution.heights[z] += 1
+	    solution.heights[x] -= 1
+	    list_of_moves.append(move_to_add)
+	    
+	    
+    return list_of_moves
