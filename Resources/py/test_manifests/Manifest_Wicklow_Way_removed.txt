@@ -42,8 +42,8 @@ I2	Vic and co, CDs
 I3	Vic and co, LPs
 I4	Vic and co, Tapes
 I5	Vic and co, MP3s
-K1	Walmart, misc
-K2	Rosales, eggs
-K3	Rosales, fish
-K4	Rosales, fowl
-K5	Rosales, apples
+J1	Walmart, misc
+J2	Rosales, eggs
+J3	Rosales, fish
+J4	Rosales, fowl
+J5	Rosales, apples
