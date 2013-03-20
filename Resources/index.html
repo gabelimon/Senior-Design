@@ -131,22 +131,22 @@
     	  </div>
       </div>
       
-      
-      
       <!--Upload manifest modal-->
-      <div id="uploadManifest" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div id="uploadManifest" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="uploadManifestLabel" aria-hidden="true">
 	      <div class="modal-header">
        	  <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i></button>
-      	  <h3 id="viewLogLabel">Logs</h3>
+      	  <h3 id="uploadManifestLabel">Logs</h3>
        	</div>
   	    <div class="modal-body">
          <textarea id="manifestBody" class="modal-inner"></textarea>
        </div>
 	      <div class="modal-footer">
-	        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-	        <button class="btn btn-primary">Save changes</button>
+	        <button id="manifestDismiss" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+	        <button id="uploadManifestSubmit" class="btn btn-primary">Save changes</button>
     	  </div>
       </div>
+      
+      
       
       <!--Text dump manifest modal-->
       <div id="getManifest" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -158,8 +158,7 @@
          <div id="manifestDump" class="container modal-inner">Stuff n things</div>
        </div>
 	      <div class="modal-footer">
-	        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-	        <button class="btn btn-primary">Save changes</button>
+  	      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
     	  </div>
       </div>
       
@@ -174,7 +173,6 @@
        </div>
 	      <div class="modal-footer">
 	        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-	        <button class="btn btn-primary">Save changes</button>
     	  </div>
       </div>
       
@@ -187,14 +185,14 @@
       	</div>
       	<div class="modal-body">
       	  <form id="userForm">
-    	      <label class="radio">
+    	      <!--<label class="radio">
     	        <input type="radio" name="userName" id="userID-1" value="Keogh" checked>
               Keogh
 	          </label>
 	          <label class="radio">
-              <input type="radio" name="UserName" id="userID-2" value="Jeff">
+              <input type="radio" name="userName" id="userID-2" value="Jeff">
               Jeff
-	          </label>
+	          </label>-->
 	          <input type="password" placeholder="Password" required="required"><br/>
 	          <button type="submit" class="btn btn-primary">Submit</button>
 	        </form>
@@ -216,7 +214,7 @@
 	            <div class="field">Desired User Name: <input type="text" placeholder="Alex123" name="createUser" required="required" class="pull-right"></div>
 	            <div class="field">Password: <input type="password" name="createPasswd" required="required" class="pull-right"></div>
 	            <div class="field">Confirm: <input type="password" name="confirmPasswd" required="required" class="pull-right"></div>
-	            <button type="submit" class="btn btn-primary">Submit</button>
+	            <button type="submit" class="btn btn-primary pull-right">Submit</button>
 	          </p>
 	        </form>
     	  </div>

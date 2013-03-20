@@ -30,7 +30,6 @@ def valid_manifest(manifest):
 
 def format_manifest(manifest_string):
     assert valid_manifest(manifest_string)
-    
     manifest = {
         'A': [unoccupied]*6,
         'B': [unoccupied]*6,
@@ -45,9 +44,9 @@ def format_manifest(manifest_string):
         'buffer':[]
         }
     for TEU in manifest_string.split('\n'):
-        cargo = manifest[2:].strip()
+        cargo = TEU[2:].strip()
         if cargo != "Unoccupied":
-            manifest[TEU[0]][int(TEU[1])] = cargo
+            manifest[TEU[0]][int(TEU[1])-1] = cargo
 
     return manifest
     

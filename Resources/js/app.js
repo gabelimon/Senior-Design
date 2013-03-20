@@ -1,62 +1,91 @@
-$(document).ready( function() {
-    var window = Ti.UI.currentWindow;
-    window.maximize();
+function logMyErrors(e) {
+  console.log(e);
+}
+
+$(document).ready(function () {
+    try {
+      var window = Ti.UI.currentWindow;
+      window.maximize();
+    }
+    catch (e) {
+      // statements to handle any exceptions
+      logMyErrors(e); // pass exception object to error handler
+    }
     var userName = "";
+    currentManifest = []; // Global manifest variable
+    steps = []; // A global array of steps to finish
     // Here we should force a log on
+    //console.log("continuing");
+
+
+//Untested. Probably works
+
+function applyManifest(manifest) {
+    console.log("attempting to apply manifest");
+    var k = Object.keys(manifest); // These are the keys. I named them keys
+                                   // but that blew up because of conflicts
+    for (var i = 0; i < k.length; i++) {
+        for (var j = 0; j < 6; j++) {
+            $("#teus-inner"+" #row" + j +" ." + k[i]+" a").html(
+            manifest[k[i]][j] !== unoccupied 
+            ?(manifest[k[i]][j].substr(0, 5) + ".."):"(empty)");
+        }
+    }
+}
+
+$("#uploadManifestSubmit").click(function () {
+    //console.log("It's being called");
+    var textManifest = $("#manifestBody").val();
+    if (textManifest === "") return;
+    steps = [];
+
+    currentManifest = format_manifest(textManifest);
+    //console.log(currentManifest);
+    $("#manifestDismiss").click();
+    //console.log("attempted to close manifest loader");
+    applyManifest(currentManifest);
 });
 
 // Populate the list of users
-$("#ch-user-btn").click( function() {
-    /*
-    //Open the database first
-    var db = Ti.Database.openFile(Ti.Filesystem.getFile(
-        Ti.Filesystem.getApplicationDataDirectory(), 'craynedatabase.db'));   
-    //Create a table and insert values into it
-    db.execute("CREATE TABLE IF NOT EXISTS Users(id INTEGER, userName TEXT)");
-    db.execute("INSERT INTO Users VALUES(1,'JoeBloggs')");      
-
-    //Select from Table
-    var rows = db.execute("SELECT * FROM Users");
-    while (rows.isValidRow()) {
-      //Alert the value of fields id and firstName from the Users database
-      alert('The user id is '+ 
-        rows.fieldByName('id')+
-        ', and user name is '+
-        rows.fieldByName('userName'));
-	    rows.next();
-	    var id = rows.fieldByName('id');
-	    var name =rows.fieldByName('userName');
-	    $("#userForm").prepend('<input type="radio" name="userName" id="userID-'+
-                         	    id+'" value="'+
-        	                    name+'" checked>'+name+'</label>');
-      rows.close();
-      Db.close();
-    }*/  	                    
-    //Check for existance of a file
-    var users = Ti.Filesystem.getFile(Ti.Filesystem.getApplicationDataDirectory(),'users.txt');
-    var names = [];
-    if(!document.exists()) {
-      users.open(Ti.Filesystem.MODE_WRITE);
-      tests = [ "1,John",
-                "2,Keogh",
-                "3,Steve"];
-      for( var i = 0; i < tests.length; i++ ) {
-        users.write(tests[i]+'\n');
+$("#ch-user-btn").click(function () {
+    try {
+      userf = Ti.Filesystem.getFile(Ti.Filesystem.getApplicationDataDirectory(), 'users.txt');
+      users = Ti.Filesystem.getFileStream(Ti.Filesystem.getApplicationDataDirectory(), 'users.txt');
+      names = [];
+      if (!userf.exists()) {
+          users.open(Ti.Filesystem.MODE_WRITE);
+          tests = ["1,John",
+                  "2,Keogh",
+                  "3,Steve"
+          ];
+          for (var i = 0; i < tests.length; i++) {
+             users.write(tests[i] + '\n');
+          }
+          users.close();
       }
-      users.close();
-    }
-    var line;
-    do {
+      //line;
+      users.open(Ti.Filesystem.MODE_READ);
       line = users.readLine();
-      names.push(line.split(','));
-    }
-    while(line!==null);  
+      do {
+          names.push(line.split(','));
+          line = users.readLine();
+      }
+      while (line !== null);
+      users.close();
 
-    for( var i=0; i<names.length; i++) {
-      var id = names[i][0]
-	    var name = names[i][1];
-	    $("#userForm").prepend('<input type="radio" name="userName" id="userID-'+
-                         	    id+'" value="'+
-        	                    name+'" checked>'+name+'</label>');
-    }
+      for (var i = 0; i < names.length; i++) {
+          if( names[i]==="" ) break;
+          var id = names[i][0]
+          var name = names[i][1];
+          $("#userForm").prepend('<label class="radio"><input type="radio" ' +
+              ' name="userName" id="userID-' +
+              id + '" value="' +
+              name + '">' + name + '</label>');
+     }
+  }
+  catch (e) {
+    // statements to handle any exceptions
+    logMyErrors(e); // pass exception object to error handler
+  }
+});
 });
