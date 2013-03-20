@@ -46,7 +46,7 @@ def format_manifest(manifest_string):
         }
     for TEU in manifest_string.split('\n'):
         cargo = manifest[2:].strip()
-        if cargo != unoccupied:
+        if cargo != "Unoccupied":
             manifest[TEU[0]][int(TEU[1])] = cargo
 
     return manifest
