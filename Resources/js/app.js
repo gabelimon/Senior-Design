@@ -6,6 +6,7 @@ $(document).ready(function () {
     try {
       var window = Ti.UI.currentWindow;
       window.maximize();
+<<<<<<< HEAD
 
     } catch (e) {
         // statements to handle any exceptions
@@ -16,10 +17,17 @@ $(document).ready(function () {
     // statements to handle any exceptions
 
 
+=======
+    }
+    catch (e) {
+      // statements to handle any exceptions
+      logMyErrors(e); // pass exception object to error handler
+>>>>>>> parent of 3c6051c... updating
     }
     var userName = "";
     currentManifest = []; // Global manifest variable
     steps = []; // A global array of steps to finish
+<<<<<<< HEAD
 
     
     // We should create the log file if it's not there
@@ -89,6 +97,14 @@ $(document).ready(function () {
     //Untested. Probably works
 
 
+=======
+    // Here we should force a log on
+    //console.log("continuing");
+
+
+    //Untested. Probably works
+
+>>>>>>> parent of 3c6051c... updating
     function applyManifest(manifest) {
         console.log("attempting to apply manifest");
         console.log(Object.keys(manifest) +',' + manifest["A"].length);
@@ -98,6 +114,7 @@ $(document).ready(function () {
         // as I iterate
         for (var i = 0; i < k.length; i++) {
             for (var j = 0; j < 6; j++) {
+<<<<<<< HEAD
 
                 if(manifest[k[i]][j] !== unoccupied) {
                     //console.log("attempting to write to: "+ "#teus-inner #row" + j+1 +" ." + k[i]+" a");
@@ -114,6 +131,11 @@ $(document).ready(function () {
 
 
 
+=======
+                $("#teus-inner"+" #row" + j +" ." + k[i]+" a").html(
+                manifest[k[i]][j] !== unoccupied 
+                ?(manifest[k[i]][j].substr(0, 5) + ".."):"(empty)");
+>>>>>>> parent of 3c6051c... updating
             }
         }
     }
@@ -123,15 +145,20 @@ $(document).ready(function () {
         var textManifest = $("#manifestBody").val();
         if (textManifest === "") return;
         currentManifest = format_manifest(textManifest);
+<<<<<<< HEAD
 
        //console.log("MANIFEST FORMATTED");
 
         //console.log(currentManifest);
 
+=======
+        //console.log(currentManifest);
+>>>>>>> parent of 3c6051c... updating
         $("#manifestDismiss").click();
         //console.log("attempted to close manifest loader");
         applyManifest(currentManifest);
     });
+<<<<<<< HEAD
 
     
     // Display log history
@@ -153,6 +180,8 @@ $(document).ready(function () {
            console.log("error: "+e); // pass exception object to error handler
         }
     });
+=======
+>>>>>>> parent of 3c6051c... updating
 
 
 
