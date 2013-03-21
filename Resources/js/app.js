@@ -3,7 +3,8 @@ $(document).ready(function () {
     try {
       var window = Ti.UI.currentWindow;
       window.maximize();
-    } catch (e) {
+    }
+    catch (e) {
         // statements to handle any exceptions
         console.log("ERROR ERROR: "+e); // pass exception object to error handler
     }
@@ -20,7 +21,8 @@ $(document).ready(function () {
             logs.write("CREATED "+Date());
             logs.close();
         }
-    } catch(e) {
+    }
+    catch(e) {
     // statements to handle any exceptions
         console.log("ERROR ERROR: "+e); // pass exception object to error handler
     }  
@@ -57,7 +59,7 @@ $(document).ready(function () {
         if( $(this).hasClass('disabled') ) return;
         var col = $(this).parent().replace(" span1 teu", ""); //gets column
         var row = parseInt($(this).parent$().parent().attr("id").replace('row','')); //gets row
-        steps = remove_boxes( currentManifest, [col,row] );
+        steps = remove_box( currentManifest, [col,row] );
     });
 
     // Dumps out the buffer
@@ -69,7 +71,7 @@ $(document).ready(function () {
         $("#bufferDump").html(bufferContents);
     });
 
-    // Throws the manifest onto the screen
+    // Throws the manifest onto the screen :)
     function applyManifest(manifest) {
         var cols = ['A','B','C','D','E','F','G','H','I','H','buffer'];
         var manifestString = "";
@@ -116,15 +118,16 @@ $(document).ready(function () {
           var logs = Ti.Filesystem.getFileStream(Ti.Filesystem.getApplicationDataDirectory(), 'logs.txt');
           logs.open(Ti.Filesystem.MODE_READ);
           var line = logs.readLine();
-          logStr = "";
+          var logStr = "";
           do {
-              logStr += line;
-              line = "<p>"+logs.readLine()+"</p>";
+              logStr += "<p>" + line + "</a>";
+              line = logs.readLine();
           }
           while (line !== null);
           logs.close();
           $("#logSpace").html(logStr);
-        } catch (e) {
+        }
+        catch (e) {
            // statements to handle any exceptions
            console.log("error: "+e); // pass exception object to error handler
         }
@@ -150,6 +153,7 @@ $(document).ready(function () {
           //line;
           users.open(Ti.Filesystem.MODE_READ);
           var line = users.readLine();
+          var names =[]
           do {
               names.push(line.split(','));
               line = users.readLine();
@@ -157,16 +161,20 @@ $(document).ready(function () {
           while (line !== null);
           users.close();
 
+          var userDisplay = "";
           for (var i = 0; i < names.length; i++) {
-              if( names[i]==="" ) break;
+              if( names[i][0]==="" ) break;
               var id = names[i][0]
               var name = names[i][1];
-              $("#userForm").html('<label class="radio"><input type="radio" ' +
+              
+              userDisplay += '<label class="radio"><input type="radio" ' +
                   ' name="userName" id="userID-' +
                   id + '" value="' +
-                  name + '">' + name + '</label>');
+                  name + '">' + name + '</label>';
          }
-      } catch (e) {
+         $("#userForm").html(userDisplay + '<input type="password" placeholder="Password" required="required"><br/><button type="submit" class="btn btn-primary">Submit</button>');
+      }
+      catch (e) {
         // statements to handle any exceptions
         console.log("error: "+e); // pass exception object to error handler
       }
