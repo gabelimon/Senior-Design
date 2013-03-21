@@ -2,24 +2,40 @@ body {
     background-image: url('../img/wild_oliva.png');
 }
 
+.field {
+    padding-bottom:20px;
+}
+
+.modal-inner {
+    width: auto;
+    max-height: 100px;
+}
+
+input[type="password"], input[type="text"] {
+    height: auto;
+}
+
 #teus-inner .btn{
     font-size: 10pt;
 }
 
-#selected-label > p{
+#selected-label > h3 {
+    line-height: 20px;
     text-align: center;
     color: white;
 }
 
 @font-face {
-  font-family: 'Anchor Steam';
-  src: url('../img/Anchor Steam NF.ttf');
+    font-family: 'Anchor Steam';
+    src: url('../img/Anchor Steam NF.ttf');
 }
 
 .jumbotron > h1{
     text-align: center;
     color:white;
-    font-family: 'Anchor Steam';
+/*
+  font-family: 'Anchor Steam';
+  */
 }
 
 #ch-user-container {
@@ -45,5 +61,5 @@ body {
 }
 
 #importantButtons {
-    padding-top:30px;
+    padding-top:20px;
 }

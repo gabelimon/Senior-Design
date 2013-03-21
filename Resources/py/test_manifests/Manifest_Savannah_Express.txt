@@ -43,8 +43,8 @@ I2	Unoccupied
 I3	Unoccupied
 I4	Unoccupied
 I5	Unoccupied
-K1	Walmart, misc
-K2	Unoccupied
-K3	Unoccupied
-K4	Unoccupied
-K5	Unoccupied
+J1	Walmart, misc
+J2	Unoccupied
+J3	Unoccupied
+J4	Unoccupied
+J5	Unoccupied
