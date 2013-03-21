@@ -3,8 +3,7 @@ $(document).ready(function () {
     try {
       var window = Ti.UI.currentWindow;
       window.maximize();
-    }
-    catch (e) {
+    } catch (e) {
         // statements to handle any exceptions
         console.log("ERROR ERROR: "+e); // pass exception object to error handler
     }
@@ -21,8 +20,7 @@ $(document).ready(function () {
             logs.write("CREATED "+Date());
             logs.close();
         }
-    }
-    catch(e) {
+    } catch(e) {
     // statements to handle any exceptions
         console.log("ERROR ERROR: "+e); // pass exception object to error handler
     }  
@@ -59,7 +57,7 @@ $(document).ready(function () {
         if( $(this).hasClass('disabled') ) return;
         var col = $(this).parent().replace(" span1 teu", ""); //gets column
         var row = parseInt($(this).parent$().parent().attr("id").replace('row','')); //gets row
-        steps = run_A_get_Moves( currentManifest, [col,row] );
+        steps = remove_boxes( currentManifest, [col,row] );
     });
 
     // Dumps out the buffer
@@ -71,7 +69,7 @@ $(document).ready(function () {
         $("#bufferDump").html(bufferContents);
     });
 
-    // Throws the manifest onto the screen :)
+    // Throws the manifest onto the screen
     function applyManifest(manifest) {
         var cols = ['A','B','C','D','E','F','G','H','I','H','buffer'];
         var manifestString = "";
@@ -88,7 +86,7 @@ $(document).ready(function () {
             if(k[i]==="buffer") continue;
             for (var j = 0; j < 6; j++) {
                 if(manifest[k[i]][j] !== unoccupied) {
-                    console.log("attempting to write to: "+ "#teus-inner #row" + j+1 +" ." + k[i]+" a");
+                    //console.log("attempting to write to: "+ "#teus-inner #row" + j+1 +" ." + k[i]+" a");
                     $("#teus-inner #row" + (j+1) +" ." + k[i]+" a").html( 
                     manifest[k[i]][j].substr(0, 5) + "..")
                     .removeClass("disabled");
@@ -126,8 +124,7 @@ $(document).ready(function () {
           while (line !== null);
           logs.close();
           $("#logSpace").html(logStr);
-        }
-        catch (e) {
+        } catch (e) {
            // statements to handle any exceptions
            console.log("error: "+e); // pass exception object to error handler
         }
@@ -169,8 +166,7 @@ $(document).ready(function () {
                   id + '" value="' +
                   name + '">' + name + '</label>');
          }
-      }
-      catch (e) {
+      } catch (e) {
         // statements to handle any exceptions
         console.log("error: "+e); // pass exception object to error handler
       }
