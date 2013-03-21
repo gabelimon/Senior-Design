@@ -1,48 +1,15 @@
-function logMyErrors(e) {
-  console.log(e);
-}
-
 $(document).ready(function () {
+    //maximize
     try {
       var window = Ti.UI.currentWindow;
       window.maximize();
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-
     } catch (e) {
         // statements to handle any exceptions
         console.log("ERROR ERROR: "+e); // pass exception object to error handler
-
-
-
-    // statements to handle any exceptions
-
-
-=======
-=======
->>>>>>> parent of 3c6051c... updating
-=======
->>>>>>> parent of 3c6051c... updating
     }
-    catch (e) {
-      // statements to handle any exceptions
-      logMyErrors(e); // pass exception object to error handler
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> parent of 3c6051c... updating
-=======
->>>>>>> parent of 3c6051c... updating
-=======
->>>>>>> parent of 3c6051c... updating
-    }
-    var userName = "";
+    userName = "";
     currentManifest = []; // Global manifest variable
     steps = []; // A global array of steps to finish
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-
     
     // We should create the log file if it's not there
     try {
@@ -58,11 +25,7 @@ $(document).ready(function () {
         console.log("ERROR ERROR: "+e); // pass exception object to error handler
     }  
     
-
-
     // Here we should force a log on
-    //console.log("continuing");
-
 
 
     // Copies manifest to clipboard
@@ -107,47 +70,21 @@ $(document).ready(function () {
     });
 
     // Throws the manifest onto the screen
-
-    //Untested. Probably works
-
-
-=======
-    // Here we should force a log on
-    //console.log("continuing");
-
-
-    //Untested. Probably works
-
->>>>>>> parent of 3c6051c... updating
-=======
-    // Here we should force a log on
-    //console.log("continuing");
-
-
-    //Untested. Probably works
-
->>>>>>> parent of 3c6051c... updating
-=======
-    // Here we should force a log on
-    //console.log("continuing");
-
-
-    //Untested. Probably works
-
->>>>>>> parent of 3c6051c... updating
     function applyManifest(manifest) {
-        console.log("attempting to apply manifest");
-        console.log(Object.keys(manifest) +',' + manifest["A"].length);
+        var cols = ['A','B','C','D','E','F','G','H','I','H','buffer'];
+        var manifestString = "";
+        for( var i = 0; i < cols.length; i++ ) {
+            for( var j = 0; j < manifest[cols[i]].length; j++) {
+                manifestString += "<p>"+cols[i]+j+"&nbsp;"+manifest[cols[i]][j]+"</p>";
+            }
+        }
+        $("#manifestDump").html(manifestString);
         var k = Object.keys(manifest); // These are the keys. I named them keys
                                        // but that blew up because of conflicts
-        // There are currently bugs here. I'm getting an undefined object error
-        // as I iterate
-        for (var i = 0; i < k.length; i++) {
-            for (var j = 0; j < 6; j++) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 
+        for (var i = 0; i < k.length; i++) {
+            if(k[i]==="buffer") continue;
+            for (var j = 0; j < 6; j++) {
                 if(manifest[k[i]][j] !== unoccupied) {
                     //console.log("attempting to write to: "+ "#teus-inner #row" + j+1 +" ." + k[i]+" a");
                     $("#teus-inner #row" + (j+1) +" ." + k[i]+" a").html( 
@@ -157,64 +94,24 @@ $(document).ready(function () {
                 else {
                     $("#teus-inner #row" + (j+1) +" ." + k[i]+" a")
                     .html("(empty)").addClass("disabled");
-
-
-
-
-
-
-=======
-                $("#teus-inner"+" #row" + j +" ." + k[i]+" a").html(
-                manifest[k[i]][j] !== unoccupied 
-                ?(manifest[k[i]][j].substr(0, 5) + ".."):"(empty)");
->>>>>>> parent of 3c6051c... updating
-=======
-                $("#teus-inner"+" #row" + j +" ." + k[i]+" a").html(
-                manifest[k[i]][j] !== unoccupied 
-                ?(manifest[k[i]][j].substr(0, 5) + ".."):"(empty)");
->>>>>>> parent of 3c6051c... updating
-=======
-                $("#teus-inner"+" #row" + j +" ." + k[i]+" a").html(
-                manifest[k[i]][j] !== unoccupied 
-                ?(manifest[k[i]][j].substr(0, 5) + ".."):"(empty)");
->>>>>>> parent of 3c6051c... updating
+                }
             }
         }
     }
 
+    //Upload manifest
     $("#uploadManifestSubmit").click(function () {
-        //console.log("It's being called");
         var textManifest = $("#manifestBody").val();
         if (textManifest === "") return;
+        steps = [];
+
         currentManifest = format_manifest(textManifest);
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-       //console.log("MANIFEST FORMATTED");
-
-        //console.log(currentManifest);
-
-=======
-        //console.log(currentManifest);
->>>>>>> parent of 3c6051c... updating
-=======
-        //console.log(currentManifest);
->>>>>>> parent of 3c6051c... updating
-=======
-        //console.log(currentManifest);
->>>>>>> parent of 3c6051c... updating
         $("#manifestDismiss").click();
-        //console.log("attempted to close manifest loader");
         applyManifest(currentManifest);
     });
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-
     
     // Display log history
-   $('#viewLogbtn').click(function() {
+    $('#viewLogbtn').click(function() {
         try {
           var logs = Ti.Filesystem.getFileStream(Ti.Filesystem.getApplicationDataDirectory(), 'logs.txt');
           logs.open(Ti.Filesystem.MODE_READ);
@@ -232,26 +129,18 @@ $(document).ready(function () {
            console.log("error: "+e); // pass exception object to error handler
         }
     });
-=======
->>>>>>> parent of 3c6051c... updating
-
-
-=======
->>>>>>> parent of 3c6051c... updating
-=======
->>>>>>> parent of 3c6051c... updating
 
     // Populate the list of users
     $("#ch-user-btn").click(function () {
         try {
-          userf = Ti.Filesystem.getFile(Ti.Filesystem.getApplicationDataDirectory(), 'users.txt');
-          users = Ti.Filesystem.getFileStream(Ti.Filesystem.getApplicationDataDirectory(), 'users.txt');
+          var userf = Ti.Filesystem.getFile(Ti.Filesystem.getApplicationDataDirectory(), 'users.txt');
+          var users = Ti.Filesystem.getFileStream(Ti.Filesystem.getApplicationDataDirectory(), 'users.txt');
           names = [];
           if (!userf.exists()) {
               users.open(Ti.Filesystem.MODE_WRITE);
-              tests = ["1,John",
-                      "2,Keogh",
-                      "3,Steve"
+              tests = ["1,John,pass",
+                      "2,Keogh,password123",
+                      "3,Steve,pens"
               ];
               for (var i = 0; i < tests.length; i++) {
                  users.write(tests[i] + '\n');
@@ -260,7 +149,7 @@ $(document).ready(function () {
           }
           //line;
           users.open(Ti.Filesystem.MODE_READ);
-          line = users.readLine();
+          var line = users.readLine();
           do {
               names.push(line.split(','));
               line = users.readLine();
@@ -272,14 +161,14 @@ $(document).ready(function () {
               if( names[i]==="" ) break;
               var id = names[i][0]
               var name = names[i][1];
-              $("#userForm").prepend('<label class="radio"><input type="radio" ' +
+              $("#userForm").html('<label class="radio"><input type="radio" ' +
                   ' name="userName" id="userID-' +
                   id + '" value="' +
                   name + '">' + name + '</label>');
          }
       } catch (e) {
         // statements to handle any exceptions
-        logMyErrors(e); // pass exception object to error handler
+        console.log("error: "+e); // pass exception object to error handler
       }
     });
 });
