@@ -1,15 +1,26 @@
+function logMyErrors(e) {
+  console.log(e);
+}
+
 $(document).ready(function () {
-    //maximize
     try {
       var window = Ti.UI.currentWindow;
       window.maximize();
+
     } catch (e) {
         // statements to handle any exceptions
         console.log("ERROR ERROR: "+e); // pass exception object to error handler
+
+
+
+    // statements to handle any exceptions
+
+
     }
-    userName = "";
+    var userName = "";
     currentManifest = []; // Global manifest variable
     steps = []; // A global array of steps to finish
+
     
     // We should create the log file if it's not there
     try {
@@ -25,7 +36,11 @@ $(document).ready(function () {
         console.log("ERROR ERROR: "+e); // pass exception object to error handler
     }  
     
+
+
     // Here we should force a log on
+    //console.log("continuing");
+
 
 
     // Copies manifest to clipboard
@@ -70,21 +85,20 @@ $(document).ready(function () {
     });
 
     // Throws the manifest onto the screen
+
+    //Untested. Probably works
+
+
     function applyManifest(manifest) {
-        var cols = ['A','B','C','D','E','F','G','H','I','H','buffer'];
-        var manifestString = "";
-        for( var i = 0; i < cols.length; i++ ) {
-            for( var j = 0; j < manifest[cols[i]].length; j++) {
-                manifestString += "<p>"+cols[i]+j+"&nbsp;"+manifest[cols[i]][j]+"</p>";
-            }
-        }
-        $("#manifestDump").html(manifestString);
+        console.log("attempting to apply manifest");
+        console.log(Object.keys(manifest) +',' + manifest["A"].length);
         var k = Object.keys(manifest); // These are the keys. I named them keys
                                        // but that blew up because of conflicts
-
+        // There are currently bugs here. I'm getting an undefined object error
+        // as I iterate
         for (var i = 0; i < k.length; i++) {
-            if(k[i]==="buffer") continue;
             for (var j = 0; j < 6; j++) {
+
                 if(manifest[k[i]][j] !== unoccupied) {
                     //console.log("attempting to write to: "+ "#teus-inner #row" + j+1 +" ." + k[i]+" a");
                     $("#teus-inner #row" + (j+1) +" ." + k[i]+" a").html( 
@@ -94,23 +108,34 @@ $(document).ready(function () {
                 else {
                     $("#teus-inner #row" + (j+1) +" ." + k[i]+" a")
                     .html("(empty)").addClass("disabled");
-                }
+
+
+
+
+
+
             }
         }
     }
 
-    //Upload manifest
     $("#uploadManifestSubmit").click(function () {
+        //console.log("It's being called");
         var textManifest = $("#manifestBody").val();
         if (textManifest === "") return;
         currentManifest = format_manifest(textManifest);
-        //console.log("MANIFEST FORMATTED");
+
+       //console.log("MANIFEST FORMATTED");
+
+        //console.log(currentManifest);
+
         $("#manifestDismiss").click();
+        //console.log("attempted to close manifest loader");
         applyManifest(currentManifest);
     });
+
     
     // Display log history
-    $('#viewLogbtn').click(function() {
+   $('#viewLogbtn').click(function() {
         try {
           var logs = Ti.Filesystem.getFileStream(Ti.Filesystem.getApplicationDataDirectory(), 'logs.txt');
           logs.open(Ti.Filesystem.MODE_READ);
@@ -129,17 +154,19 @@ $(document).ready(function () {
         }
     });
 
+
+
     // Populate the list of users
     $("#ch-user-btn").click(function () {
         try {
-          var userf = Ti.Filesystem.getFile(Ti.Filesystem.getApplicationDataDirectory(), 'users.txt');
-          var users = Ti.Filesystem.getFileStream(Ti.Filesystem.getApplicationDataDirectory(), 'users.txt');
+          userf = Ti.Filesystem.getFile(Ti.Filesystem.getApplicationDataDirectory(), 'users.txt');
+          users = Ti.Filesystem.getFileStream(Ti.Filesystem.getApplicationDataDirectory(), 'users.txt');
           names = [];
           if (!userf.exists()) {
               users.open(Ti.Filesystem.MODE_WRITE);
-              tests = ["1,John,pass",
-                      "2,Keogh,password123",
-                      "3,Steve,pens"
+              tests = ["1,John",
+                      "2,Keogh",
+                      "3,Steve"
               ];
               for (var i = 0; i < tests.length; i++) {
                  users.write(tests[i] + '\n');
@@ -148,7 +175,7 @@ $(document).ready(function () {
           }
           //line;
           users.open(Ti.Filesystem.MODE_READ);
-          var line = users.readLine();
+          line = users.readLine();
           do {
               names.push(line.split(','));
               line = users.readLine();
@@ -160,14 +187,14 @@ $(document).ready(function () {
               if( names[i]==="" ) break;
               var id = names[i][0]
               var name = names[i][1];
-              $("#userForm").html('<label class="radio"><input type="radio" ' +
+              $("#userForm").prepend('<label class="radio"><input type="radio" ' +
                   ' name="userName" id="userID-' +
                   id + '" value="' +
                   name + '">' + name + '</label>');
          }
       } catch (e) {
         // statements to handle any exceptions
-        console.log("error: "+e); // pass exception object to error handler
+        logMyErrors(e); // pass exception object to error handler
       }
     });
 });

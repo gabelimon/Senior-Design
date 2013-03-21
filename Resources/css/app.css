@@ -2,16 +2,6 @@ body {
     background-image: url('../img/wild_oliva.png');
 }
 
-#manifestBody {
-    width: 500px;
-    min-height: 300px;
-}
-
-#manifestDump {
-    width: 500px;
-    min-height: 300px;
-}
-
 .field {
     padding-bottom:20px;
 }
