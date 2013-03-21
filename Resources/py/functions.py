@@ -14,7 +14,7 @@ stack = []
 #truck position in index
 t_pos = ["T",1]
 #buffer position in index
-b_pos = ["K",10]
+b_pos = ["K",4]
 
 class node:
     def __init__(self):
@@ -30,6 +30,7 @@ def valid_manifest(manifest):
 
 def format_manifest(manifest_string):
     assert valid_manifest(manifest_string)
+    
     manifest = {
         'A': [unoccupied]*6,
         'B': [unoccupied]*6,
@@ -44,9 +45,9 @@ def format_manifest(manifest_string):
         'buffer':[]
         }
     for TEU in manifest_string.split('\n'):
-        cargo = TEU[2:].strip()
-        if cargo != "Unoccupied":
-            manifest[TEU[0]][int(TEU[1])-1] = cargo
+        cargo = manifest[2:].strip()
+        if cargo != unoccupied:
+            manifest[TEU[0]][int(TEU[1])] = cargo
 
     return manifest
     
@@ -172,12 +173,6 @@ def A_Star(parent, position, goal, stack):
                 stack.append([stack_child, f_n])
                 child.heights = h_temp[:]
                 
-#                print "old g(n):",child.gn
-#                print "new g(n): ",stack_child.gn
-#                print "h(n): ",h
-#                print "f(n): ",f_n
-#                print stack_child.heights , "\n"
-                
         #sort the stack based on it's f_n value
         # and pop the top off the stack
         stack = sorted(stack, key = lambda tup: tup[1])
@@ -204,13 +199,49 @@ def manifest_to_heights(manifest):
         for y in xrange(len(manifest[x])):
             if manifest[x][y] == unoccupied:
                 h.append(y)
-                break 
+                break
     h.append(0)
-    return h
+    return h 
 
-def run_A_get_Moves(manifest, TEU_to_pull):
-    s_x = ord(TEU_to_pull[0])-65   
-    s_y = TEU_to_pull[1]
+def move_box(manifest, startpos, endpos):
+    assert len(startpos) == 2, "The start position is invalid"
+    assert len(endpos) == 2, "The end position is invalid"
+    
+    rtrn = list(manifest)
+
+    s_x = ord(startpos[0])-65
+    s_y = startpos[1]-1
+    e_x = ord(endpos[0])-65
+    e_y = endpos[1]-1
+
+    print "SY", e_y
+
+    assert (s_x < 11 and s_x >= 0),"Starting position out of scope"
+    assert (s_y < 6 and s_y >= 0),"Starting position out of scope"
+    assert (e_x < 11 and e_x >= 0),"Ending position out of scope"
+    assert (e_y < 6 and e_y >= 0),"Ending position out of scope"
+
+
+    if (s_x == 10):
+        rtrn[e_x][e_y] = rtrn[s_x].pop();
+    elif (e_x == 10):
+        temp = rtrn[s_x][s_y]
+        rtrn[s_x][s_y] = unoccupied
+        rtrn[e_x].append(temp)
+    else:
+        temp = rtrn[s_x][s_y]
+        rtrn[s_x][s_y] = rtrn[e_x][e_y]
+        rtrn[e_x][e_y] = temp
+
+    
+    
+    return rtrn
+
+#desiredBoxPos is a tuple ex; ['A',1]
+#it gets converted to a 0 to 9 and 1 to 6 values
+def remove_boxes(manifest, desiredBoxPos):
+    s_x = ord(desiredBoxPos[0])-65   
+    s_y = desiredBoxPos[1]
     manifest_heights = manifest_to_heights(manifest)
     problem = node()
     problem.heights = list(manifest_heights)
@@ -248,3 +279,22 @@ def run_A_get_Moves(manifest, TEU_to_pull):
 	    
 	    
     return list_of_moves
+
+def insert_box(manifest, label):
+    pos_x = -1
+    pos_y = -1
+    
+    assert len(label) > 5, "The TEU label has too few characters"
+
+    for x in xrange(10):
+        for y in xrange(5):
+            if(manifest[x][y] == unoccupied):
+                pos_x = x
+                pos_y = y
+                break
+        if(pos_x > -1):
+            break
+
+    assert pos_x > -1, "No free space on ship to add TEU"
+    rtrn = [chr(pos_x+65),pos_y+1]
+    return rtrn
