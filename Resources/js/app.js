@@ -103,9 +103,8 @@ $(document).ready(function () {
     $("#uploadManifestSubmit").click(function () {
         var textManifest = $("#manifestBody").val();
         if (textManifest === "") return;
-        steps = [];
-
         currentManifest = format_manifest(textManifest);
+        //console.log("MANIFEST FORMATTED");
         $("#manifestDismiss").click();
         applyManifest(currentManifest);
     });
