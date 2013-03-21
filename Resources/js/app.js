@@ -7,6 +7,7 @@ $(document).ready(function () {
       var window = Ti.UI.currentWindow;
       window.maximize();
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     } catch (e) {
         // statements to handle any exceptions
@@ -18,15 +19,21 @@ $(document).ready(function () {
 
 
 =======
+=======
+>>>>>>> parent of 3c6051c... updating
     }
     catch (e) {
       // statements to handle any exceptions
       logMyErrors(e); // pass exception object to error handler
+<<<<<<< HEAD
+>>>>>>> parent of 3c6051c... updating
+=======
 >>>>>>> parent of 3c6051c... updating
     }
     var userName = "";
     currentManifest = []; // Global manifest variable
     steps = []; // A global array of steps to finish
+<<<<<<< HEAD
 <<<<<<< HEAD
 
     
@@ -105,6 +112,14 @@ $(document).ready(function () {
     //Untested. Probably works
 
 >>>>>>> parent of 3c6051c... updating
+=======
+    // Here we should force a log on
+    //console.log("continuing");
+
+
+    //Untested. Probably works
+
+>>>>>>> parent of 3c6051c... updating
     function applyManifest(manifest) {
         console.log("attempting to apply manifest");
         console.log(Object.keys(manifest) +',' + manifest["A"].length);
@@ -114,6 +129,7 @@ $(document).ready(function () {
         // as I iterate
         for (var i = 0; i < k.length; i++) {
             for (var j = 0; j < 6; j++) {
+<<<<<<< HEAD
 <<<<<<< HEAD
 
                 if(manifest[k[i]][j] !== unoccupied) {
@@ -136,6 +152,11 @@ $(document).ready(function () {
                 manifest[k[i]][j] !== unoccupied 
                 ?(manifest[k[i]][j].substr(0, 5) + ".."):"(empty)");
 >>>>>>> parent of 3c6051c... updating
+=======
+                $("#teus-inner"+" #row" + j +" ." + k[i]+" a").html(
+                manifest[k[i]][j] !== unoccupied 
+                ?(manifest[k[i]][j].substr(0, 5) + ".."):"(empty)");
+>>>>>>> parent of 3c6051c... updating
             }
         }
     }
@@ -146,6 +167,7 @@ $(document).ready(function () {
         if (textManifest === "") return;
         currentManifest = format_manifest(textManifest);
 <<<<<<< HEAD
+<<<<<<< HEAD
 
        //console.log("MANIFEST FORMATTED");
 
@@ -154,10 +176,14 @@ $(document).ready(function () {
 =======
         //console.log(currentManifest);
 >>>>>>> parent of 3c6051c... updating
+=======
+        //console.log(currentManifest);
+>>>>>>> parent of 3c6051c... updating
         $("#manifestDismiss").click();
         //console.log("attempted to close manifest loader");
         applyManifest(currentManifest);
     });
+<<<<<<< HEAD
 <<<<<<< HEAD
 
     
@@ -184,6 +210,8 @@ $(document).ready(function () {
 >>>>>>> parent of 3c6051c... updating
 
 
+=======
+>>>>>>> parent of 3c6051c... updating
 
     // Populate the list of users
     $("#ch-user-btn").click(function () {
