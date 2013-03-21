@@ -14,7 +14,7 @@ stack = []
 #truck position in index
 t_pos = ["T",1]
 #buffer position in index
-b_pos = ["K",4]
+b_pos = ["buffer",4]
 
 class node:
     def __init__(self):
@@ -29,8 +29,7 @@ def valid_manifest(manifest):
     return True
 
 def format_manifest(manifest_string):
-    assert valid_manifest(manifest_string)
-    
+    #assert valid_manifest(manifest_string)
     manifest = {
         'A': [unoccupied]*6,
         'B': [unoccupied]*6,
@@ -44,7 +43,7 @@ def format_manifest(manifest_string):
         'J': [unoccupied]*6,
         'buffer':[]
         }
-    for TEU in manifest_string.split('\n'):
+    for TEU in manifest_string.splitlines():
         cargo = manifest[2:].strip()
         if cargo != unoccupied:
             manifest[TEU[0]][int(TEU[1])] = cargo
