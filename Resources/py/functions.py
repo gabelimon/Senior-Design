@@ -30,6 +30,7 @@ def valid_manifest(manifest):
 
 def format_manifest(manifest_string):
     assert valid_manifest(manifest_string)
+    
     manifest = {
         'A': [unoccupied]*6,
         'B': [unoccupied]*6,
@@ -44,9 +45,9 @@ def format_manifest(manifest_string):
         'buffer':[]
         }
     for TEU in manifest_string.split('\n'):
-        cargo = TEU[2:].strip()
-        if cargo != "Unoccupied":
-            manifest[TEU[0]][int(TEU[1])-1] = cargo
+        cargo = manifest[2:].strip()
+        if cargo != unoccupied:
+            manifest[TEU[0]][int(TEU[1])] = cargo
 
     return manifest
     
@@ -200,7 +201,7 @@ def manifest_to_heights(manifest):
                 h.append(y)
                 break
     h.append(0)
-    return h
+    return h 
 
 def move_box(manifest, startpos, endpos):
     assert len(startpos) == 2, "The start position is invalid"
