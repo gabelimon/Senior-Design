@@ -30,6 +30,7 @@ def valid_manifest(manifest):
 
 def format_manifest(manifest_string):
     assert valid_manifest(manifest_string)
+    # unnocupied is a placeholder string
     manifest = {
         'A': [unoccupied]*6,
         'B': [unoccupied]*6,
@@ -41,7 +42,8 @@ def format_manifest(manifest_string):
         'H': [unoccupied]*6,
         'I': [unoccupied]*6,
         'J': [unoccupied]*6,
-        'buffer':[]
+        'buffer': []#,
+        #'T': []
         }
     for TEU in manifest_string.splitlines():
         cargo = TEU[2:].strip()
@@ -140,7 +142,7 @@ def A_Star(parent, position, goal, stack):
     
     #if the goal TEU is the top TEU in the column at 'position' than set the 'gn' and 'move' to moving it to the truck, ['T',1], and return that child node
    
-    if parent.heights[position] == goal:		
+    if parent.heights[position] == goal:    
         child.gn = truck_cost(child.heights,position,goal)
         child.move = [[chr(position+char_conv),child.heights[position]],list(t_pos)]
         child.heights[position] -= 1
@@ -159,8 +161,8 @@ def A_Star(parent, position, goal, stack):
                     child.move = [[chr(position+char_conv),child.heights[position]], [chr(x + char_conv), child.heights[x]+1]]
 
                 gn_to_add = compute_g(child.heights,position, x)
-		child.heights[position] -=1
-		child.heights[x] += 1
+                child.heights[position] -=1
+                child.heights[x] += 1
                 # append the new child to the stack
                 # use stack_child so as not to overwrite child in the for loop
                 stack_child = node()
@@ -171,13 +173,6 @@ def A_Star(parent, position, goal, stack):
                 f_n = stack_child.gn + h
                 stack.append([stack_child, f_n])
                 child.heights = h_temp[:]
-                
-#                print "old g(n):",child.gn
-#                print "new g(n): ",stack_child.gn
-#                print "h(n): ",h
-#                print "f(n): ",f_n
-#                print stack_child.heights , "\n"
-                
         #sort the stack based on it's f_n value
         # and pop the top off the stack
         stack = sorted(stack, key = lambda tup: tup[1])
@@ -188,23 +183,23 @@ def A_Star(parent, position, goal, stack):
 
 def list_moves(child):
     if child.parent == 0: 
-	thing =[]
-	thing.append(list(child.move))
-	thing.pop()
-	return thing
+        thing =[]
+        thing.append(list(child.move))
+        thing.pop()
+        return thing
     else:
-	thing = list_moves(child.parent) 
-	thing.append(list(child.move))
-	return thing
+        thing = list_moves(child.parent) 
+        thing.append(list(child.move))
+        return thing
     
 def manifest_to_heights(manifest):
     h = []
-    
-    for x in xrange(len(manifest)) :
-        for y in xrange(len(manifest[x])):
-            if manifest[x][y] == unoccupied:
-                h.append(y)
-                break 
+    for x in manifest:
+        if manifest[x]:
+            for y in xrange(len(manifest[x])):
+                 if manifest[x][y] == unoccupied:
+                     h.append(y)
+                     break 
     h.append(0)
     return h
     
@@ -220,58 +215,63 @@ def remove_box(manifest, TEU_to_pull):
     cost = 0
     ran = solution.heights[10]
     for x in xrange (ran):
-	best = 5000
-	z = 11
-	for y in xrange(10):
-	    cost = buff_cost(solution.heights, y, solution.heights[y])
-	    if cost < best:
-		best = cost
-		z = y
-	solution.heights[z] += 1
-	solution.heights[10] -= 1
-	move_to_add = [list(b_pos), [chr(z+char_conv),solution.heights[z]]]
-	list_of_moves.append(move_to_add)
+        best = 5000
+        z = 11
+        for y in xrange(10):
+            cost = buff_cost(solution.heights, y, solution.heights[y])
+            if cost < best:
+                best = cost
+                z = y
+        solution.heights[z] += 1
+        solution.heights[10] -= 1
+        move_to_add = [list(b_pos), [chr(z+char_conv),solution.heights[z]]]
+        list_of_moves.append(move_to_add)
     for x in xrange(10):
-	if solution.heights[x] > 5:
-	    best = 5000
-	    z = 11
-	    for y in range(10):
-		if solution.heights[y] < 5:
-	            cost = compute_g(solution.heights, x, y)
-		    if best > cost: 
-		        best = cost
-		        z = y
+        if solution.heights[x] > 5:
+            best = 5000
+            z = 11
+            for y in range(10):
+                if solution.heights[y] < 5:
+                    cost = compute_g(solution.heights, x, y)
+                    if best > cost: 
+                        best = cost
+                        z = y
          
-	    move_to_add = [[chr(x+char_conv),solution.heights[x]], [chr(z + char_conv), solution.heights[z]+1]]
-	    solution.heights[z] += 1
-	    solution.heights[x] -= 1
-	    list_of_moves.append(move_to_add)
-	    
-	    
+            move_to_add = [[chr(x+char_conv),solution.heights[x]], [chr(z + char_conv), solution.heights[z]+1]]
+            solution.heights[z] += 1
+            solution.heights[x] -= 1
+            list_of_moves.append(move_to_add)
+      
+      
     return list_of_moves
-    
+
+#Pass in a manifest dictionary
+#a startpos, which is a letter representing the column
+#and an endtpos, which is a letter representing the column
 def move_box(manifest, startpos, endpos):
-    assert len(startpos) == 2, "The start position is invalid"
-    assert len(endpos) == 2, "The end position is invalid"
+    assert startpos != endpos, "The start and end positions are identical"
+    rtrn = manifest
+
+    s_x = startpos
+    e_x = endpos
+    s_y = 0
+    e_y = 0
+
+    if(s_x != 'buffer'):    
+        s_y = get_height(manifest,startpos)
+        if(manifest[s_x][s_y] == unoccupied):
+            s_y -= 1
     
-    rtrn = list(manifest)
+    if(e_x == 'T'):
+        rtrn[s_x][s_y]=unoccupied
+        return rtrn
+     
+    if(e_x != 'buffer'):
+        e_y = get_height(manifest,endpos)
 
-    s_x = ord(startpos[0])-65
-    s_y = startpos[1]-1
-    e_x = ord(endpos[0])-65
-    e_y = endpos[1]-1
-
-    print "SY", e_y
-
-    assert (s_x < 11 and s_x >= 0),"Starting position out of scope"
-    assert (s_y < 6 and s_y >= 0),"Starting position out of scope"
-    assert (e_x < 11 and e_x >= 0),"Ending position out of scope"
-    assert (e_y < 6 and e_y >= 0),"Ending position out of scope"
-
-
-    if (s_x == 10):
+    if (s_x == 'buffer'):
         rtrn[e_x][e_y] = rtrn[s_x].pop();
-    elif (e_x == 10):
+    elif (e_x == 'buffer'):
         temp = rtrn[s_x][s_y]
         rtrn[s_x][s_y] = unoccupied
         rtrn[e_x].append(temp)
@@ -279,26 +279,23 @@ def move_box(manifest, startpos, endpos):
         temp = rtrn[s_x][s_y]
         rtrn[s_x][s_y] = rtrn[e_x][e_y]
         rtrn[e_x][e_y] = temp
-
-    
     
     return rtrn
 
-def insert_box(manifest, label):
+
+def insert_box(manifest):
     pos_x = -1
     pos_y = -1
     
-    assert len(label) > 5, "The TEU label has too few characters"
-
     for x in xrange(10):
-        for y in xrange(5):
-            if(manifest[x][y] == unoccupied):
-                pos_x = x
-                pos_y = y
+        for y in xrange(6):
+            if(manifest[chr(x+65)][y+1] == unoccupied):
+                pos_x = chr(x+65)
+                pos_y = y+1
                 break
         if(pos_x > -1):
             break
 
     assert pos_x > -1, "No free space on ship to add TEU"
-    rtrn = [chr(pos_x+65),pos_y+1]
+    rtrn = [pos_x,pos_y]
     return rtrn

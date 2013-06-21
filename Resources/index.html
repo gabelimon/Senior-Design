@@ -104,9 +104,9 @@
       	<a class="btn btn-info span1" href="#getManifest" role="button" data-toggle="modal">Retrieve Manifest</a>
       	<a class="btn btn-warning span1" href="#uploadManifest" role="button" data-toggle="modal">Load New Manifest</a>
 	      <a class="btn btn-danger span1 offset2 disabled" href="#" id="removeTEUbtn">Remove TEU</a>
-      	<a class="btn btn-danger span1" href="#" id="addTEUbtn">Add TEU</a>
-      	<a class="btn btn-inverse span1 offset2" href="#" id="cancelStepbtn">Cancel Step</a>
-      	<a class="btn btn-success span1" href="#" id="nextStepbtn">Next Step (confirm)</a>
+      	<a class="btn btn-danger span1" href="#addTEU" data-toggle="modal">Add TEU</a>
+      	<a class="btn btn-inverse span1 offset2 disabled" href="#" id="cancelStepbtn">Cancel Step</a>
+      	<a class="btn btn-success span1 disabled" href="#" id="nextStepbtn">Next Step (confirm)</a>
       </div>
       <div id="importantButtons" class="span12">
         <a href="#viewLog" class="btn btn-success pull-left span10" role="button" data-toggle="modal" id="viewLogbtn">View Logs</a>
@@ -141,8 +141,8 @@
          <textarea id="manifestBody" class="modal-inner"></textarea>
        </div>
 	      <div class="modal-footer">
-	        <button id="manifestDismiss" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-	        <button id="uploadManifestSubmit" class="btn btn-primary">Save changes</button>
+	        <button id="manifestDismissbtn" class="btn pull-left" data-dismiss="modal" aria-hidden="true">Close</button>
+	        <button id="uploadManifestSubmit" class="btn btn-primary" data-dismiss="modal">Save changes</button>
     	  </div>
       </div>
       
@@ -160,6 +160,21 @@
 	      <div class="modal-footer">
 	        <button class="btn-primary pull-left" data-dismiss="modal" aria-hidden="true" id="copyBtn">Copy</button>
   	      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    	  </div>
+      </div>
+      
+      <!--Add TEU modal-->
+      <div id="addTEU" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	      <div class="modal-header">
+       	  <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i></button>
+      	  <h3 id="viewLogLabel">Add TEU</h3>
+       	</div>
+  	    <div class="modal-body">
+         TEU to add: <input id="addedTEU" type="text"></input>
+       </div>
+	      <div class="modal-footer">
+  	      <button class="btn pull-left" data-dismiss="modal" aria-hidden="true">Close</button>
+  	      <button id="addTEUSbtn" class="btn-primary pull-right" data-dismiss="modal" aria-hidden="true">Add</button>
     	  </div>
       </div>
       
@@ -187,7 +202,8 @@
       	<div class="modal-body">
       	  <form id="userForm">
 	          <input type="password" placeholder="Password" required="required"><br/>
-	          <button type="submit" class="btn btn-primary">Submit</button>
+	          <strong id="loginErrField"></strong>
+	          <button id="loginbtn" type="submit" class="btn btn-primary">Submit</button>
 	        </form>
 	      </div>
   	    <div class="modal-footer">
@@ -207,7 +223,8 @@
 	            <div class="field">Desired User Name: <input type="text" placeholder="Alex123" name="createUser" required="required" class="pull-right"></div>
 	            <div class="field">Password: <input type="password" name="createPasswd" required="required" class="pull-right"></div>
 	            <div class="field">Confirm: <input type="password" name="confirmPasswd" required="required" class="pull-right"></div>
-	            <button type="submit" class="btn btn-primary pull-right">Submit</button>
+	            <strong id="createUserErrField"></strong>
+	            <button id="createUserbtn" type="submit" class="btn btn-primary pull-right">Submit</button>
 	          </p>
 	        </form>
     	  </div>

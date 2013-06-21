@@ -8,9 +8,16 @@ $(document).ready(function () {
         // statements to handle any exceptions
         console.log("ERROR ERROR: "+e); // pass exception object to error handler
     }
+    
+    // Undo disabling
+    $("#teus-inner a").removeClass("btn-danger");
+    
+    userID = 0;
     userName = "";
-    currentManifest = []; // Global manifest variable
+    users = []; // All users
+    currentManifest = {}; // Global manifest variable
     steps = []; // A global array of steps to finish
+    truckLabel="";
     
     // We should create the log file if it's not there
     try {
@@ -25,10 +32,13 @@ $(document).ready(function () {
     catch(e) {
     // statements to handle any exceptions
         console.log("ERROR ERROR: "+e); // pass exception object to error handler
-    }  
-    
+    }
+
+
+    // TODO    
     // Here we should force a log on
 
+    // END
 
     // Copies manifest to clipboard
     $("#copyBtn").click(function() {
@@ -51,15 +61,143 @@ $(document).ready(function () {
         $('#addTEUbtn').addClass('disabled');
         $('#removeTEUbtn').removeClass('disabled');
     });
+    
+    // Highlights the start and end position
+    function highlightNextStep () {
+        // Remove old highlighting
+        $("#teus-inner a.btn-info").removeClass("btn-info");
+        $("#teus-inner a.btn-warning").removeClass("btn-warning");
+        $("#teus-inner a.btn-warning").removeClass("btn-warning");
 
+        if( steps.length === 0 ) {
+            $("#directions").html("Select TEU to remove");
+            return;
+        }
+        
+        var start = steps[0][0];
+        var end = steps[0][1];
+        // Highlight new objects
+        $("#teus-inner #row" + start[1] + " ." + start[0] + " a").addClass("btn-info");
+        $("#teus-inner #row" + end[1] + " ." + end[0] + " a").addClass("btn-warning");
+        // Output directions
+        $("#directions").html("Move " + start[0] + start[1] +
+                              " to " + end[0] + end[1]);
+        var selected = $("#teus-inner a.btn-success");
+        if( selected.html() === "(empty)" ) selected.removeClass("btn-success");
+        $("#teus-inner a").addClass("disabled");
+    }
+    
+    // Begins the process of applying steps
+    function beginSteps() {
+        // disable all TEU buttons
+        $("#teus-inner a").addClass("disabled");
+        // enable next and cancel
+        $("#cancelStepbtn,#nextStepbtn").removeClass("disabled");
+        // Highlight the start and end points
+        highlightNextStep();
+    }
+    
+    function writeToLog( message ) {
+        try {
+            var logs = Ti.Filesystem.getFileStream(Ti.Filesystem.getApplicationDataDirectory(), 'logs.txt');
+            logs.open(Ti.Filesystem.MODE_APPEND);
+            logs.write(message);
+            logs.close();
+        }
+        catch(e) {
+        // statements to handle any exceptions
+            console.log("ERROR ERROR: "+e); // pass exception object to error handler
+        }
+    }
 
     // WORKING HERE
-    // This part actually generates the steps
-    $("#removeTEU").click( function() {
+    
+    // Continue to next step
+    // THIS SHOULD BE DONE ONCE MOVE_BOX IS UPDATED
+    $("#nextStepbtn").click( function() {
+        // Write to log
+        var col = steps[0][0][0]; //gets column
+        var row = steps[0][0][1]; //gets row
+        var targetCol = steps[0][1][0]; //gets column
+        var targetRow = steps[0][1][1]; //gets row
+        writeToLog(userName + ": Moved " + currentManifest[col][row] +
+                   " from " + col + row + " to " +
+                   targetCol + targetRow + '\n');
+        // Update output
+        currentManifest = move_box(currentManifest, steps[0][0][0], steps[0][1][0]);
+
+        applyManifest(currentManifest);
+        steps = steps.splice(1);
+        // Change highlighting
+        highlightNextStep();
+        var selected = $("#teus-inner a.btn-success");
+        if( selected.html() === "(empty)" ) selected.removeClass("btn-success");
+        if( steps.length === 0 ) {
+            $("#teus-inner a").removeClass("btn-info")
+                            .removeClass("btn-success")
+                            .removeClass("btn-warning");
+            $("#addTEUbtn").removeClass("disabled");
+            $("#nextStepbtn,#cancelStepbtn").addClass("disabled");
+            $("#directions").html("Select TEU to remove");
+            return;
+        }
+        $("#teu-inner a").addClass("disabled");
+    });
+
+    // Add in TEU
+    // This SHOULD be done.
+    $("#addTEUbtn").click( function() {
+    //    if( $(this).hasClass("disabled") ) return;
+    //    currentManifest["T"][1] = $("addedTEU").val();
+    //    dest = insert_box(currentManifest);
+    //    steps = [[['T',1],dest]];
+    //    beginSteps();
+    });
+    
+    // Log in user
+    $("#loginbtn").click( function() {
+        var user = $("#userForm input [type=radio]").val();
+        // Assuming they logged in remove disabling
+        userName = user;
+        $("#chUser button.btn").removeClass("disabled");
+    });
+    
+    // Create new user
+    $("#createUserbtn").click( function() {
+    
+    });
+    
+    // END WORK HERE
+    
+    // Cancel steps
+    $("#cancelStepbtn").click( function() {
+        var col = $("#teus-inner .btn-success").parent().attr("class").replace(" span1 teu", ""); //gets column
+        var row = parseInt($("#teus-inner .btn-success").parent().parent().attr("id").replace('row','')); //gets row
+        writeToLog(userName + ": Canceled removal of " + currentManifest[col][row]);
+        steps = [];
+        $("#teus-inner a").removeClass("btn-info")
+                          .removeClass("btn-success")
+                          .removeClass("btn-warning");
+        $("#removeTEUbtn,#addTEUbtn").toggleClass("disabled");
+        $("#cancelStepbtn,#nextStepbtn").addClass("disabled");
+        // NOT OPTIMAL. I NEED TO ITERATE OVER EACH OBJECT
+        applyManifest(currentManifest);
+        $("#directions").html("Select TEU to remove");
+    });
+    
+    // Removes manifest pasted in when you close the modal.
+    $("#manifestDismissbtn").click( function() {
+        $("#manifestBody").html("Select TEU to remove");
+    });
+    
+    // Removes TEU
+    $("#removeTEUbtn").click( function() {
         if( $(this).hasClass('disabled') ) return;
-        var col = $(this).parent().replace(" span1 teu", ""); //gets column
-        var row = parseInt($(this).parent$().parent().attr("id").replace('row','')); //gets row
+        $(this).addClass('disabled');
+        var col = $("#teus-inner .btn-success").parent().attr("class").replace(" span1 teu", ""); //gets column
+        var row = parseInt($("#teus-inner .btn-success").parent().parent().attr("id").replace('row','')); //gets row
         steps = remove_box( currentManifest, [col,row] );
+        beginSteps();
     });
 
     // Dumps out the buffer
@@ -73,7 +211,7 @@ $(document).ready(function () {
 
     // Throws the manifest onto the screen :)
     function applyManifest(manifest) {
-        var cols = ['A','B','C','D','E','F','G','H','I','H','buffer'];
+        var cols = ['A','B','C','D','E','F','G','H','I','H'];
         var manifestString = "";
         for( var i = 0; i < cols.length; i++ ) {
             for( var j = 0; j < manifest[cols[i]].length; j++) {
@@ -88,7 +226,6 @@ $(document).ready(function () {
             if(k[i]==="buffer") continue;
             for (var j = 0; j < 6; j++) {
                 if(manifest[k[i]][j] !== unoccupied) {
-                    //console.log("attempting to write to: "+ "#teus-inner #row" + j+1 +" ." + k[i]+" a");
                     $("#teus-inner #row" + (j+1) +" ." + k[i]+" a").html( 
                     manifest[k[i]][j].substr(0, 5) + "..")
                     .removeClass("disabled");
@@ -108,8 +245,8 @@ $(document).ready(function () {
         steps = [];
 
         currentManifest = format_manifest(textManifest);
-        $("#manifestDismiss").click();
         applyManifest(currentManifest);
+        $("#manifestBody").val("");
     });
     
     // Display log history
@@ -138,7 +275,6 @@ $(document).ready(function () {
         try {
           var userf = Ti.Filesystem.getFile(Ti.Filesystem.getApplicationDataDirectory(), 'users.txt');
           var users = Ti.Filesystem.getFileStream(Ti.Filesystem.getApplicationDataDirectory(), 'users.txt');
-          names = [];
           if (!userf.exists()) {
               users.open(Ti.Filesystem.MODE_WRITE);
               tests = ["1,John,pass",
